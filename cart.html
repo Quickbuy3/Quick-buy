@@ -11,22 +11,20 @@
 
 <header>
   <h1>🛒 Quick Buy Cart</h1>
+  <a href="index.html" style="color:white;">⬅ Continue Shopping</a>
 </header>
 
 <section>
   <div class="product">
     <h2>Your Cart</h2>
 
-    <div id="cartItems">
-      Cart is empty
-    </div>
+    <div id="cartItems"></div>
 
     <h3 id="total">Total: ₹0</h3>
 
     <button onclick="checkout()">Proceed to Checkout</button>
   </div>
 </section>
-
 
 <script>
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -36,23 +34,27 @@ let totalBox = document.getElementById("total");
 
 let total = 0;
 
-if(cart.length > 0){
+if (cart.length > 0) {
   cartBox.innerHTML = "";
 
   cart.forEach((item) => {
+    total += item.price;
+
     cartBox.innerHTML += `
-      <p>🛍️ ${item}</p>
+      <div class="product">
+        <h3>${item.name}</h3>
+        <p>Price: ₹${item.price}</p>
+      </div>
     `;
   });
 
-  totalBox.innerHTML = "Total: Added items";
-}
-else {
-  cartBox.innerHTML = "Cart is empty";
+  totalBox.innerHTML = "Total: ₹" + total;
+} else {
+  cartBox.innerHTML = "<p>🛒 Your cart is empty.</p>";
 }
 
-function checkout(){
-  alert("Checkout coming soon!");
+function checkout() {
+  alert("Checkout feature will be added soon!");
 }
 </script>
 
