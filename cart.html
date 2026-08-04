@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Buy Cart</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+<h1>🛒 Your Cart</h1>
+</header>
+
+<section>
+<div class="product">
+<h3>Your cart items</h3>
+<p id="cartItems">Cart is empty</p>
+</div>
+</section>
+
+<script>
+let items = JSON.parse(localStorage.getItem("cart")) || [];
+
+document.getElementById("cartItems").innerHTML =
+items.length ? items.join("<br>") : "Cart is empty";
+</script>
+
+</body>
+</html>
