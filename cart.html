@@ -10,21 +10,50 @@
 <body>
 
 <header>
-<h1>🛒 Your Cart</h1>
+  <h1>🛒 Quick Buy Cart</h1>
 </header>
 
 <section>
-<div class="product">
-<h3>Your cart items</h3>
-<p id="cartItems">Cart is empty</p>
-</div>
+  <div class="product">
+    <h2>Your Cart</h2>
+
+    <div id="cartItems">
+      Cart is empty
+    </div>
+
+    <h3 id="total">Total: ₹0</h3>
+
+    <button onclick="checkout()">Proceed to Checkout</button>
+  </div>
 </section>
 
-<script>
-let items = JSON.parse(localStorage.getItem("cart")) || [];
 
-document.getElementById("cartItems").innerHTML =
-items.length ? items.join("<br>") : "Cart is empty";
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+let cartBox = document.getElementById("cartItems");
+let totalBox = document.getElementById("total");
+
+let total = 0;
+
+if(cart.length > 0){
+  cartBox.innerHTML = "";
+
+  cart.forEach((item) => {
+    cartBox.innerHTML += `
+      <p>🛍️ ${item}</p>
+    `;
+  });
+
+  totalBox.innerHTML = "Total: Added items";
+}
+else {
+  cartBox.innerHTML = "Cart is empty";
+}
+
+function checkout(){
+  alert("Checkout coming soon!");
+}
 </script>
 
 </body>
