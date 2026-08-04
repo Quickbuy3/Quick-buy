@@ -40,12 +40,26 @@ section {
   border-radius: 10px;
   flex: 1;
   text-align: center;
+  min-width: 120px;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
 }
 
 .product {
   background: white;
   margin: 10px 0;
   padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.product img {
+  width: 100%;
+  max-width: 250px;
   border-radius: 10px;
 }
 
@@ -55,4 +69,9 @@ button {
   border: none;
   padding: 10px 20px;
   border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
 }
