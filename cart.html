@@ -10,52 +10,86 @@
 <body>
 
 <header>
-  <h1>🛒 Quick Buy Cart</h1>
-  <a href="index.html" style="color:white;">⬅ Continue Shopping</a>
+<h1>🛒 Quick Buy Cart</h1>
+<a href="index.html" style="color:white;">⬅ Continue Shopping</a>
 </header>
 
 <section>
-  <div class="product">
-    <h2>Your Cart</h2>
+<div class="product">
 
-    <div id="cartItems"></div>
+<h2>Your Cart</h2>
 
-    <h3 id="total">Total: ₹0</h3>
+<div id="cartItems"></div>
 
-    <button onclick="checkout()">Proceed to Checkout</button>
-  </div>
+<h3 id="total">Total: ₹0</h3>
+
+<button onclick="checkout()">Proceed to Checkout</button>
+
+</div>
 </section>
 
 <script>
+
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 let cartBox = document.getElementById("cartItems");
 let totalBox = document.getElementById("total");
 
-let total = 0;
+function loadCart(){
 
-if (cart.length > 0) {
-  cartBox.innerHTML = "";
+cartBox.innerHTML="";
 
-  cart.forEach((item) => {
-    total += item.price;
+let total=0;
 
-    cartBox.innerHTML += `
-      <div class="product">
-        <h3>${item.name}</h3>
-        <p>Price: ₹${item.price}</p>
-      </div>
-    `;
-  });
-
-  totalBox.innerHTML = "Total: ₹" + total;
-} else {
-  cartBox.innerHTML = "<p>🛒 Your cart is empty.</p>";
+if(cart.length===0){
+cartBox.innerHTML="<p>🛒 Your cart is empty.</p>";
+totalBox.innerHTML="Total: ₹0";
+return;
 }
 
-function checkout() {
-  alert("Checkout feature will be added soon!");
+cart.forEach((item,index)=>{
+
+let price=item.price*item.qty;
+total+=price;
+
+cartBox.innerHTML+=`
+<div class="product">
+<h3>${item.name}</h3>
+<p>Price: ₹${item.price}</p>
+<p>Quantity: ${item.qty}</p>
+<p><b>Subtotal: ₹${price}</b></p>
+
+<button onclick="removeItem(${index})">
+Remove
+</button>
+
+</div>
+`;
+
+});
+
+totalBox.innerHTML="Total: ₹"+total;
+
 }
+
+function removeItem(index){
+
+cart.splice(index,1);
+
+localStorage.setItem("cart",JSON.stringify(cart));
+
+loadCart();
+
+}
+
+function checkout(){
+
+alert("Checkout feature coming soon.");
+
+}
+
+loadCart();
+
 </script>
 
 </body>
