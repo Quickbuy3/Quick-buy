@@ -30,6 +30,25 @@
 
 <input type="text" id="city" placeholder="City"><br><br>
 
+<input type="text" id="state" placeholder="State"><br><br>
+
+<h3>Payment Method</h3>
+
+<label>
+<input type="radio" name="payment" checked>
+Cash on Delivery (COD)
+</label>
+
+<br><br>
+
+<div id="orderSummary" class="cart-summary">
+<h3>Order Summary</h3>
+<p id="totalItems"></p>
+<p id="totalAmount"></p>
+</div>
+
+<br>
+
 <button onclick="placeOrder()">Place Order</button>
 
 </div>
@@ -37,13 +56,36 @@
 </section>
 
 <script>
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+let totalItems = cart.reduce((t, i) => t + i.qty, 0);
+let totalAmount = cart.reduce((t, i) => t + (i.price * i.qty), 0);
+
+window.onload = function () {
+  document.getElementById("totalItems").innerHTML =
+    "Items: " + totalItems;
+
+  document.getElementById("totalAmount").innerHTML =
+    "<b>Total: ₹" + totalAmount + "</b>";
+}
+
 function placeOrder(){
 
 let name=document.getElementById("name").value;
 let mobile=document.getElementById("mobile").value;
 let address=document.getElementById("address").value;
+let pincode=document.getElementById("pincode").value;
+let city=document.getElementById("city").value;
+let state=document.getElementById("state").value;
 
-if(name==="" || mobile==="" || address===""){
+if(
+name==="" ||
+mobile==="" ||
+address==="" ||
+pincode==="" ||
+city==="" ||
+state===""){
 alert("Please fill all details.");
 return;
 }
@@ -55,6 +97,7 @@ localStorage.removeItem("cart");
 window.location.href="index.html";
 
 }
+
 </script>
 
 </body>
