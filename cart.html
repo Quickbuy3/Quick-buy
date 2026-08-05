@@ -54,13 +54,14 @@ total+=price;
 
 cartBox.innerHTML+=`
 <div class="product">
+<img src="${item.image}" alt="${item.name}" style="width:120px;height:120px;object-fit:cover;border-radius:10px;">
 <h3>${item.name}</h3>
 <p>Price: ₹${item.price}</p>
 <p>Quantity: ${item.qty}</p>
 <p><b>Subtotal: ₹${price}</b></p>
 
 <button onclick="removeItem(${index})">
-Remove
+🗑️ Remove
 </button>
 
 </div>
