@@ -1,1 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile - Quick Buy</title>
+<link rel="stylesheet" href="style.css">
+</head>
 
+<body>
+
+<header>
+<h1>👤 My Profile</h1>
+<a href="index.html" style="color:white;text-decoration:none;">🏠 Home</a>
+</header>
+
+<section>
+
+<div class="product">
+
+<h2>Personal Details</h2>
+
+<input type="text" id="username" placeholder="Your Name"><br><br>
+
+<input type="tel" id="mobile" placeholder="Mobile Number"><br><br>
+
+<input type="email" id="email" placeholder="Email Address"><br><br>
+
+<button onclick="saveProfile()">💾 Save Profile</button>
+
+</div>
+
+<br>
+
+<div class="product">
+
+<h2>My Account</h2>
+
+<button onclick="window.location.href='cart.html'">
+🛒 My Cart
+</button>
+
+<button onclick="window.location.href='checkout.html'">
+💳 Checkout
+</button>
+
+<button onclick="alert('My Orders Module Coming Soon')">
+📦 My Orders
+</button>
+
+<button onclick="alert('Wishlist Module Coming Soon')">
+❤️ Wishlist
+</button>
+
+<button onclick="alert('Settings Module Coming Soon')">
+⚙️ Settings
+</button>
+
+<button onclick="logout()" style="background:#d32f2f;">
+🚪 Logout
+</button>
+
+</div>
+
+</section>
+
+<script>
+
+function saveProfile(){
+
+let user={
+name:document.getElementById("username").value,
+mobile:document.getElementById("mobile").value,
+email:document.getElementById("email").value
+};
+
+localStorage.setItem("profile",JSON.stringify(user));
+
+alert("✅ Profile Saved Successfully");
+
+}
+
+function logout(){
+
+localStorage.removeItem("profile");
+
+alert("Logged Out");
+
+window.location.href="index.html";
+
+}
+
+</script>
+
+</body>
+</html>
