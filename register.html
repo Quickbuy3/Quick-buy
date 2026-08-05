@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register - Quick Buy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+<h1>📝 Create Account</h1>
+<a href="login.html" style="color:white;text-decoration:none;">⬅ Login</a>
+</header>
+
+<section>
+
+<div class="product">
+
+<h2>Register</h2>
+
+<input type="text" id="name" placeholder="Full Name" style="width:100%;padding:12px;margin:10px 0;">
+
+<input type="email" id="email" placeholder="Email" style="width:100%;padding:12px;margin:10px 0;">
+
+<input type="password" id="password" placeholder="Password" style="width:100%;padding:12px;margin:10px 0;">
+
+<button onclick="register()">Create Account</button>
+
+</div>
+
+</section>
+
+<script>
+
+function register(){
+
+let name=document.getElementById("name").value;
+let email=document.getElementById("email").value;
+let password=document.getElementById("password").value;
+
+if(name==="" || email==="" || password===""){
+alert("Please fill all fields.");
+return;
+}
+
+alert("🎉 Account Created Successfully!");
+
+window.location.href="login.html";
+
+}
+
+</script>
+
+</body>
+</html>
