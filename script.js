@@ -2,6 +2,9 @@ let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 function addToCart(name, price) {
 
+  let product = event.target.closest(".product");
+  let image = product.querySelector("img").src;
+
   let existing = cart.find(item => item.name === name);
 
   if (existing) {
@@ -10,7 +13,8 @@ function addToCart(name, price) {
     cart.push({
       name: name,
       price: price,
-      qty: 1
+      qty: 1,
+      image: image
     });
   }
 
@@ -22,6 +26,7 @@ function addToCart(name, price) {
 function getCartCount() {
   return cart.reduce((total, item) => total + item.qty, 0);
 }
+
 function searchProducts() {
 
   let input = document.getElementById("search").value.toLowerCase();
