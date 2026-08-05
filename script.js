@@ -22,3 +22,22 @@ function addToCart(name, price) {
 function getCartCount() {
   return cart.reduce((total, item) => total + item.qty, 0);
 }
+function searchProducts() {
+
+  let input = document.getElementById("search").value.toLowerCase();
+
+  let products = document.querySelectorAll(".product");
+
+  products.forEach(product => {
+
+    let name = product.querySelector("h3").innerText.toLowerCase();
+
+    if (name.includes(input)) {
+      product.style.display = "block";
+    } else {
+      product.style.display = "none";
+    }
+
+  });
+
+}
