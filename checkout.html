@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout - Quick Buy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+<h1>🛒 Checkout</h1>
+<a href="cart.html" style="color:white;text-decoration:none;">⬅ Back to Cart</a>
+</header>
+
+<section>
+
+<div class="product">
+
+<h2>Delivery Details</h2>
+
+<input type="text" id="name" placeholder="Full Name"><br><br>
+
+<input type="tel" id="mobile" placeholder="Mobile Number"><br><br>
+
+<textarea id="address" placeholder="Full Address"></textarea><br><br>
+
+<input type="text" id="pincode" placeholder="Pincode"><br><br>
+
+<input type="text" id="city" placeholder="City"><br><br>
+
+<button onclick="placeOrder()">Place Order</button>
+
+</div>
+
+</section>
+
+<script>
+function placeOrder(){
+
+let name=document.getElementById("name").value;
+let mobile=document.getElementById("mobile").value;
+let address=document.getElementById("address").value;
+
+if(name==="" || mobile==="" || address===""){
+alert("Please fill all details.");
+return;
+}
+
+alert("🎉 Order Placed Successfully!");
+
+localStorage.removeItem("cart");
+
+window.location.href="index.html";
+
+}
+</script>
+
+</body>
+</html>
