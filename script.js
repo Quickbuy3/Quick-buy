@@ -295,3 +295,1073 @@ document.querySelectorAll("[data-wish-badge]")
 });
 
 }
+/* ---------- Shared Chrome ---------- */
+
+function headerHTML(title){
+return `
+<header class="app-header">
+<div class="container">
+
+<div class="header-row">
+
+<a class="logo" href="index.html">
+<span class="logo-mark">Q</span>
+<span>
+Quick Buy
+<small>${title || "Shop faster. Save more."}</small>
+</span>
+</a>
+
+
+<div class="header-actions">
+
+<button class="icon-btn" data-theme-icon onclick="toggleTheme()">
+🌙
+</button>
+
+
+<a class="icon-btn" href="wishlist.html">
+❤️
+<span class="badge" data-wish-badge style="display:none">0</span>
+</a>
+
+
+<a class="icon-btn" href="cart.html">
+🛒
+<span class="badge" data-cart-badge style="display:none">0</span>
+</a>
+
+</div>
+
+</div>
+
+
+<div class="search-wrap">
+<span class="s-icon">🔍</span>
+<input id="globalSearch" type="search"
+placeholder="Search products, brands and more">
+</div>
+
+
+</div>
+</header>
+`;
+}
+
+
+
+function bottomNavHTML(active){
+
+const items=[
+["home","index.html","🏠","Home"],
+["categories","categories.html","🗂️","Categories"],
+["wishlist","wishlist.html","❤️","Wishlist"],
+["cart","cart.html","🛒","Cart"],
+["account","profile.html","👤","Account"]
+];
+
+
+return `
+<nav class="bottom-nav">
+
+${items.map(([key,href,ico,label])=>{
+
+
+let badge="";
+
+if(key==="cart"){
+badge=`<span class="nav-badge"
+data-cart-badge style="display:none">0</span>`;
+}
+
+if(key==="wishlist"){
+badge=`<span class="nav-badge"
+data-wish-badge style="display:none">0</span>`;
+}
+
+
+return `
+<a href="${href}"
+class="${active===key?"active":""}">
+
+<span class="ico">${ico}</span>
+
+${badge}
+
+<span>${label}</span>
+
+</a>
+`;
+
+}).join("")}
+
+
+</nav>
+`;
+
+}
+
+
+
+function mountChrome(activeNav,headerTitle){
+
+const h=document.getElementById("header-slot");
+
+if(h){
+h.innerHTML=headerHTML(headerTitle);
+}
+
+
+const n=document.getElementById("nav-slot");
+
+if(n){
+n.innerHTML=bottomNavHTML(activeNav);
+}
+
+
+refreshBadges();
+
+
+
+const s=document.getElementById("globalSearch");
+
+
+if(s){
+
+
+const params=new URLSearchParams(location.search);
+
+
+if(params.get("q")){
+s.value=params.get("q");
+}
+
+
+s.addEventListener("input",(e)=>{
+
+
+if(
+document.body.dataset.page==="home" ||
+document.body.dataset.page==="categories"
+){
+
+renderSearch(e.target.value);
+
+}
+
+});
+
+
+s.addEventListener("keydown",(e)=>{
+
+if(e.key==="Enter" &&
+document.body.dataset.page!=="home"){
+
+location.href=
+"index.html?q="+
+encodeURIComponent(e.target.value);
+
+}
+
+});
+
+
+}
+
+
+}
+
+
+
+/* ---------- Product Card ---------- */
+
+
+function cardHTML(p){
+
+const wished=getWish().includes(p.id);
+
+
+return `
+
+<article class="card">
+
+
+<a class="card-img"
+href="product.html?id=${p.id}">
+
+<img src="${p.img}" alt="${p.name}">
+
+<span class="off-tag">
+${discount(p)}% OFF
+</span>
+
+</a>
+
+
+<button
+class="wish-btn ${wished?"on":""}"
+data-wish="${p.id}"
+onclick="toggleWish(${p.id})">
+
+❤
+
+</button>
+
+
+
+<div class="card-body">
+
+
+<a class="card-name"
+href="product.html?id=${p.id}">
+${p.name}
+</a>
+
+
+<div class="rating">
+
+<span class="stars">
+${p.rating} ★
+</span>
+
+<span>
+(${p.reviews})
+</span>
+
+</div>
+
+
+
+<div class="price-row">
+
+<span class="price">
+${money(p.price)}
+</span>
+
+<span class="mrp">
+${money(p.mrp)}
+</span>
+
+<span class="off">
+${discount(p)}% off
+</span>
+
+</div>
+
+
+<button class="btn block"
+onclick="addToCart(${p.id})">
+
+Add to Cart
+
+</button>
+
+
+</div>
+
+
+</article>
+
+`;
+
+}
+
+
+
+function renderInto(sel,list){
+
+const el=document.querySelector(sel);
+
+if(el){
+
+el.innerHTML=list.map(cardHTML).join("");
+
+}
+
+}
+
+
+/* ---------- Home ---------- */
+
+
+function renderHome(){
+
+
+const cat=document.querySelector("#cats");
+
+
+if(cat){
+
+cat.innerHTML=CATEGORIES.map(c=>`
+
+<a class="cat"
+href="categories.html?cat=${encodeURIComponent(c.name)}">
+
+<div class="emoji">${c.emoji}</div>
+
+<span>${c.name}</span>
+
+</a>
+
+`).join("");
+
+}
+
+
+
+renderInto(
+"#featured",
+PRODUCTS.filter(p=>p.tags.includes("featured"))
+);
+
+
+renderInto(
+"#trending",
+PRODUCTS.filter(p=>p.tags.includes("trending"))
+);
+
+
+renderInto(
+"#arrivals",
+PRODUCTS.filter(p=>p.tags.includes("new"))
+);
+
+
+renderInto(
+"#deals",
+PRODUCTS.filter(p=>p.tags.includes("deal"))
+);
+
+
+const q=new URLSearchParams(location.search).get("q");
+
+if(q){
+
+renderSearch(q);
+
+}
+
+
+startSlider();
+
+
+}
+function renderSearch(q){
+
+const box=document.getElementById("searchResults");
+
+const rest=document.getElementById("homeSections");
+
+
+if(!box) return;
+
+
+q=(q||"").trim().toLowerCase();
+
+
+
+if(!q){
+
+box.innerHTML="";
+
+box.style.display="none";
+
+if(rest) rest.style.display="";
+
+return;
+
+}
+
+
+
+const hits=PRODUCTS.filter(p=>
+
+(p.name+" "+p.cat)
+.toLowerCase()
+.includes(q)
+
+);
+
+
+
+box.style.display="";
+
+if(rest) rest.style.display="none";
+
+
+
+box.innerHTML=`
+
+<div class="section">
+
+<div class="section-head">
+
+<h2>
+${hits.length} result${hits.length===1?"":"s"}
+for "${q}"
+</h2>
+
+</div>
+
+
+${hits.length ?
+
+`<div class="grid">
+${hits.map(cardHTML).join("")}
+</div>`
+
+:
+
+`
+<div class="empty">
+
+<div class="big">🔍</div>
+
+<p>
+No products matched your search.
+</p>
+
+</div>
+
+`
+
+}
+
+
+</div>
+
+`;
+
+}
+
+
+
+
+/* ---------- Slider ---------- */
+
+function startSlider(){
+
+const track=document.querySelector(".slides");
+
+
+if(!track) return;
+
+
+const total=track.children.length;
+
+
+const dots=document.querySelector(".dots");
+
+
+if(dots){
+
+dots.innerHTML=
+
+Array.from(
+{length:total},
+(_,i)=>`<i class="${i===0?"on":""}"></i>`
+).join("");
+
+}
+
+
+
+let i=0;
+
+
+let timer;
+
+
+function go(n){
+
+i=(n+total)%total;
+
+
+track.style.transform=
+`translateX(-${i*100}%)`;
+
+
+
+if(dots){
+
+[...dots.children]
+.forEach((d,k)=>
+d.classList.toggle("on",k===i)
+);
+
+}
+
+}
+
+
+
+function play(){
+
+timer=setInterval(()=>go(i+1),3500);
+
+}
+
+
+play();
+
+
+
+let startX=0;
+
+
+track.parentElement.addEventListener(
+"touchstart",
+e=>{
+
+startX=e.touches[0].clientX;
+
+clearInterval(timer);
+
+},
+{passive:true}
+);
+
+
+
+track.parentElement.addEventListener(
+"touchend",
+e=>{
+
+
+let dx=
+e.changedTouches[0].clientX-startX;
+
+
+
+if(Math.abs(dx)>40){
+
+go(i+(dx<0?1:-1));
+
+}
+
+
+play();
+
+
+},
+{passive:true}
+);
+
+
+
+}
+
+
+
+/* ---------- Categories ---------- */
+
+function renderCategories(){
+
+
+const params=
+new URLSearchParams(location.search);
+
+
+
+const active=
+params.get("cat") || "All";
+
+
+
+const chips=[
+"All",
+...CATEGORIES.map(c=>c.name)
+];
+
+
+
+const chipBox=
+document.getElementById("catChips");
+
+
+
+if(chipBox){
+
+chipBox.innerHTML=
+chips.map(c=>`
+
+<a class="chip"
+href="categories.html?cat=${encodeURIComponent(c)}">
+
+${c}
+
+</a>
+
+`).join("");
+
+}
+
+
+
+let list=PRODUCTS;
+
+
+
+if(active==="Deals"){
+
+list=PRODUCTS.filter(
+p=>p.tags.includes("deal")
+);
+
+}
+
+else if(active!=="All"){
+
+list=PRODUCTS.filter(
+p=>p.cat===active
+);
+
+}
+
+
+
+const title=
+document.getElementById("catTitle");
+
+
+if(title){
+
+title.textContent=
+active+" ("+list.length+")";
+
+}
+
+
+
+renderInto("#catGrid",list);
+
+
+
+}
+
+
+
+/* ---------- Product Detail ---------- */
+
+
+function renderProduct(){
+
+
+const id=
+new URLSearchParams(location.search)
+.get("id");
+
+
+
+const p=productById(id);
+
+
+
+const root=
+document.getElementById("pd");
+
+
+
+if(!p){
+
+root.innerHTML=`
+
+<div class="empty">
+
+<div class="big">😕</div>
+
+<p>Product not found.</p>
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+
+document.title=
+p.name+" — Quick Buy";
+
+
+
+root.innerHTML=`
+
+<div class="pd-img">
+
+<img src="${p.img}">
+
+</div>
+
+
+<div class="section">
+
+<h1 class="page-title">
+${p.name}
+</h1>
+
+
+<div class="rating">
+
+<span class="stars">
+${p.rating} ★
+</span>
+
+<span>
+${p.reviews} ratings
+</span>
+
+</div>
+
+
+
+<div class="price-row">
+
+<span class="price">
+${money(p.price)}
+</span>
+
+<span class="mrp">
+${money(p.mrp)}
+</span>
+
+
+<span class="off">
+${discount(p)}% off
+</span>
+
+</div>
+
+
+
+<button class="btn lg"
+onclick="addToCart(${p.id})">
+
+Add to Cart
+
+</button>
+
+
+</div>
+
+`;
+
+}
+/* ---------- Cart ---------- */
+
+function renderCart(){
+
+const items=getCart();
+
+const list=document.getElementById("cartList");
+
+const summary=document.getElementById("cartSummary");
+
+
+if(!items.length){
+
+list.innerHTML=`
+
+<div class="empty">
+
+<div class="big">🛒</div>
+
+<p>Your cart is empty.</p>
+
+<a class="btn" href="index.html">
+Start shopping
+</a>
+
+</div>
+
+`;
+
+if(summary) summary.innerHTML="";
+
+return;
+
+}
+
+
+
+list.innerHTML=items.map(i=>{
+
+
+const p=productById(i.id);
+
+
+return `
+
+<div class="row-item">
+
+<img src="${p.img}">
+
+
+<div class="info">
+
+
+<a class="card-name"
+href="product.html?id=${p.id}">
+${p.name}
+</a>
+
+
+<div class="price-row">
+
+<span class="price">
+${money(p.price)}
+</span>
+
+</div>
+
+
+<div class="qty">
+
+<button onclick="changeQty(${p.id},-1);renderCart()">
+−
+</button>
+
+
+<b>${i.qty}</b>
+
+
+<button onclick="changeQty(${p.id},1);renderCart()">
++
+</button>
+
+
+</div>
+
+
+<button class="link-danger"
+onclick="removeFromCart(${p.id});renderCart()">
+
+Remove
+
+</button>
+
+
+</div>
+
+</div>
+
+`;
+
+}).join("");
+
+
+
+if(summary){
+
+summary.innerHTML=`
+
+<div class="panel">
+
+
+<div class="summary-line">
+
+<span>Total</span>
+
+<b>${money(cartTotal())}</b>
+
+</div>
+
+
+<a class="btn block"
+href="checkout.html">
+
+Proceed to Checkout
+
+</a>
+
+
+</div>
+
+`;
+
+}
+
+
+}
+
+
+
+
+
+/* ---------- Wishlist ---------- */
+
+function renderWishlist(){
+
+
+const ids=getWish();
+
+
+const el=document.getElementById("wishGrid");
+
+
+if(!el) return;
+
+
+
+if(!ids.length){
+
+el.innerHTML=`
+
+<div class="empty">
+
+<div class="big">❤️</div>
+
+<p>No saved items yet.</p>
+
+<a class="btn" href="index.html">
+Browse products
+</a>
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+
+el.innerHTML=
+
+`<div class="grid">
+
+${
+ids
+.map(productById)
+.filter(Boolean)
+.map(cardHTML)
+.join("")
+}
+
+</div>`;
+
+}
+
+
+
+
+
+/* ---------- Orders ---------- */
+
+function renderOrders(){
+
+
+const orders=getOrders();
+
+
+const el=document.getElementById("ordersList");
+
+
+if(!el) return;
+
+
+
+if(!orders.length){
+
+el.innerHTML=`
+
+<div class="empty">
+
+<div class="big">📦</div>
+
+<p>No orders yet.</p>
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+
+el.innerHTML=
+
+orders.map(o=>`
+
+<div class="panel">
+
+<b>
+#${o.id}
+</b>
+
+
+<p>
+${o.status}
+</p>
+
+
+${o.items.map(i=>`
+
+<div class="row-item">
+
+<img src="${i.img}">
+
+<div>
+
+${i.name}
+
+<br>
+
+Qty: ${i.qty}
+
+</div>
+
+</div>
+
+
+`).join("")}
+
+
+<h3>
+${money(o.total)}
+</h3>
+
+
+</div>
+
+
+`).join("");
+
+}
+
+
+
+
+
+
+/* ---------- Login ---------- */
+
+
+function initLogin(){
+
+
+const form=document.getElementById("loginForm");
+
+
+if(!form) return;
+
+
+
+form.addEventListener("submit",e=>{
+
+
+e.preventDefault();
+
+
+
+const email=
+document.getElementById("lgEmail").value.trim();
+
+
+const pass=
+document.getElementById("lgPass").value;
