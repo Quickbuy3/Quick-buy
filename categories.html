@@ -1,1 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Categories — Quick Buy</title>
+<meta name="description" content="Browse Quick Buy categories: electronics, fashion, home, beauty, sports, books and toys." />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="categories">
+<div id="header-slot"></div>
+<main class="container">
+  <h1 class="page-title" id="catTitle">Categories</h1>
+  <div class="chips" id="catChips"></div>
+  <div id="searchResults" style="display:none"></div>
+  <div class="grid" id="catGrid" style="margin-top:16px"></div>
+</main>
+<div id="nav-slot"></div>
+<script src="script.js"></script>
+<script>mountChrome("categories"); renderCategories();</script>
+</body>
+</html>
 
