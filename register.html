@@ -1,57 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Register - Quick Buy</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Create Account — Quick Buy</title>
+<meta name="description" content="Register a free Quick Buy account for faster checkout and order tracking." />
+<link rel="stylesheet" href="style.css" />
 </head>
-
-<body>
-
-<header>
-<h1>📝 Create Account</h1>
-<a href="login.html" style="color:white;text-decoration:none;">⬅ Login</a>
-</header>
-
-<section>
-
-<div class="product">
-
-<h2>Register</h2>
-
-<input type="text" id="name" placeholder="Full Name" style="width:100%;padding:12px;margin:10px 0;">
-
-<input type="email" id="email" placeholder="Email" style="width:100%;padding:12px;margin:10px 0;">
-
-<input type="password" id="password" placeholder="Password" style="width:100%;padding:12px;margin:10px 0;">
-
-<button onclick="register()">Create Account</button>
-
-</div>
-
-</section>
-
-<script>
-
-function register(){
-
-let name=document.getElementById("name").value;
-let email=document.getElementById("email").value;
-let password=document.getElementById("password").value;
-
-if(name==="" || email==="" || password===""){
-alert("Please fill all fields.");
-return;
-}
-
-alert("🎉 Account Created Successfully!");
-
-window.location.href="login.html";
-
-}
-
-</script>
-
+<body data-page="register">
+<div id="header-slot"></div>
+<main class="container">
+  <h1 class="page-title">Create your account</h1>
+  <form class="panel" id="registerForm">
+    <div class="field"><label for="rgName">Full name</label><input id="rgName" required placeholder="John Doe" /></div>
+    <div class="field"><label for="rgEmail">Email</label><input id="rgEmail" type="email" required placeholder="you@example.com" /></div>
+    <div class="field"><label for="rgPass">Password</label><input id="rgPass" type="password" required placeholder="Minimum 6 characters" /></div>
+    <button class="btn block lg" type="submit">Register</button>
+    <p class="muted center" style="margin-top:14px">Already have an account? <a href="login.html" style="color:var(--orange);font-weight:700">Login</a></p>
+  </form>
+</main>
+<div id="nav-slot"></div>
+<script src="script.js"></script>
+<script>mountChrome("account"); initRegister();</script>
 </body>
 </html>
