@@ -1,96 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Profile - Quick Buy</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>My Account — Quick Buy</title>
+<meta name="description" content="Manage your Quick Buy profile, orders, wishlist and app preferences." />
+<link rel="stylesheet" href="style.css" />
 </head>
+<body data-page="profile">
+<div id="header-slot"></div>
+<main class="container">
+  <h1 class="page-title">My Account</h1>
+  <div id="profileBox"></div>
+  <div id="profileStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px"></div>
 
-<body>
-
-<header>
-<h1>👤 My Profile</h1>
-<a href="index.html" style="color:white;text-decoration:none;">🏠 Home</a>
-</header>
-
-<section>
-
-<div class="product">
-
-<h2>Personal Details</h2>
-
-<input type="text" id="username" placeholder="Your Name"><br><br>
-
-<input type="tel" id="mobile" placeholder="Mobile Number"><br><br>
-
-<input type="email" id="email" placeholder="Email Address"><br><br>
-
-<button onclick="saveProfile()">💾 Save Profile</button>
-
-</div>
-
-<br>
-
-<div class="product">
-
-<h2>My Account</h2>
-
-<button onclick="window.location.href='cart.html'">
-🛒 My Cart
-</button>
-
-<button onclick="window.location.href='checkout.html'">
-💳 Checkout
-</button>
-
-<button onclick="alert('My Orders Module Coming Soon')">
-📦 My Orders
-</button>
-
-<button onclick="alert('Wishlist Module Coming Soon')">
-❤️ Wishlist
-</button>
-
-<button onclick="alert('Settings Module Coming Soon')">
-⚙️ Settings
-</button>
-
-<button onclick="logout()" style="background:#d32f2f;">
-🚪 Logout
-</button>
-
-</div>
-
-</section>
-
-<script>
-
-function saveProfile(){
-
-let user={
-name:document.getElementById("username").value,
-mobile:document.getElementById("mobile").value,
-email:document.getElementById("email").value
-};
-
-localStorage.setItem("profile",JSON.stringify(user));
-
-alert("✅ Profile Saved Successfully");
-
-}
-
-function logout(){
-
-localStorage.removeItem("profile");
-
-alert("Logged Out");
-
-window.location.href="index.html";
-
-}
-
-</script>
-
+  <div class="menu-list">
+    <a href="orders.html">📦 My Orders <span class="arrow">›</span></a>
+    <a href="wishlist.html">❤️ My Wishlist <span class="arrow">›</span></a>
+    <a href="cart.html">🛒 My Cart <span class="arrow">›</span></a>
+    <a href="categories.html">🗂️ Browse Categories <span class="arrow">›</span></a>
+    <button data-theme-icon-wrap onclick="toggleTheme()">🌗 Dark Mode <span class="arrow">Toggle</span></button>
+    <button id="logoutBtn" onclick="logout()" style="color:var(--red);display:none">🚪 Logout <span class="arrow">›</span></button>
+  </div>
+  <p class="muted center" style="margin:22px 0">Quick Buy v2.0 · Made with ❤️</p>
+</main>
+<div id="nav-slot"></div>
+<script src="script.js"></script>
+<script>mountChrome("account"); renderProfile();</script>
 </body>
 </html>
