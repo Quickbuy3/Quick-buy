@@ -1,104 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Checkout - Quick Buy</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Checkout — Quick Buy</title>
+<meta name="description" content="Enter your delivery details and place your Quick Buy order securely." />
+<link rel="stylesheet" href="style.css" />
 </head>
-
-<body>
-
-<header>
-<h1>🛒 Checkout</h1>
-<a href="cart.html" style="color:white;text-decoration:none;">⬅ Back to Cart</a>
-</header>
-
-<section>
-
-<div class="product">
-
-<h2>Delivery Details</h2>
-
-<input type="text" id="name" placeholder="Full Name"><br><br>
-
-<input type="tel" id="mobile" placeholder="Mobile Number"><br><br>
-
-<textarea id="address" placeholder="Full Address"></textarea><br><br>
-
-<input type="text" id="pincode" placeholder="Pincode"><br><br>
-
-<input type="text" id="city" placeholder="City"><br><br>
-
-<input type="text" id="state" placeholder="State"><br><br>
-
-<h3>Payment Method</h3>
-
-<label>
-<input type="radio" name="payment" checked>
-Cash on Delivery (COD)
-</label>
-
-<br><br>
-
-<div id="orderSummary" class="cart-summary">
-<h3>Order Summary</h3>
-<p id="totalItems"></p>
-<p id="totalAmount"></p>
-</div>
-
-<br>
-
-<button onclick="placeOrder()">Place Order</button>
-
-</div>
-
-</section>
-
-<script>
-
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-let totalItems = cart.reduce((t, i) => t + i.qty, 0);
-let totalAmount = cart.reduce((t, i) => t + (i.price * i.qty), 0);
-
-window.onload = function () {
-  document.getElementById("totalItems").innerHTML =
-    "Items: " + totalItems;
-
-  document.getElementById("totalAmount").innerHTML =
-    "<b>Total: ₹" + totalAmount + "</b>";
-}
-
-function placeOrder(){
-
-let name=document.getElementById("name").value;
-let mobile=document.getElementById("mobile").value;
-let address=document.getElementById("address").value;
-let pincode=document.getElementById("pincode").value;
-let city=document.getElementById("city").value;
-let state=document.getElementById("state").value;
-
-if(
-name==="" ||
-mobile==="" ||
-address==="" ||
-pincode==="" ||
-city==="" ||
-state===""){
-alert("Please fill all details.");
-return;
-}
-
-alert("🎉 Order Placed Successfully!");
-
-localStorage.removeItem("cart");
-
-window.location.href="index.html";
-
-}
-
-</script>
-
+<body data-page="checkout">
+<div id="header-slot"></div>
+<main class="container" id="checkoutBody">
+  <h1 class="page-title">Checkout</h1>
+  <div id="checkoutSummary"></div>
+  <form class="panel" id="checkoutForm" style="margin-top:14px">
+    <div class="field"><label for="coName">Full name</label><input id="coName" required placeholder="John Doe" /></div>
+    <div class="field"><label for="coEmail">Email</label><input id="coEmail" type="email" required placeholder="you@example.com" /></div>
+    <div class="field"><label for="coPhone">Phone</label><input id="coPhone" type="tel" required pattern="[0-9]{10}" placeholder="10-digit mobile number" /></div>
+    <div class="field"><label for="coAddress">Delivery address</label><textarea id="coAddress" rows="3" required placeholder="House no, street, city, PIN"></textarea></div>
+    <div class="field"><label for="coPayment">Payment method</label>
+      <select id="coPayment">
+        <option>Cash on Delivery</option>
+        <option>UPI</option>
+        <option>Credit / Debit Card</option>
+        <option>Net Banking</option>
+      </select>
+    </div>
+    <button class="btn block lg" type="submit">Place Order</button>
+  </form>
+</main>
+<div id="nav-slot"></div>
+<script src="script.js"></script>
+<script>mountChrome("cart"); renderCheckout();</script>
 </body>
 </html>
