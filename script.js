@@ -1365,3 +1365,239 @@ document.getElementById("lgEmail").value.trim();
 
 const pass=
 document.getElementById("lgPass").value;
+  
+const user =
+getUsers()
+.find(
+u=>u.email===email &&
+u.password===pass
+);
+
+
+if(!user){
+
+toast("Invalid login","err");
+
+return;
+
+}
+
+
+setUser({
+name:user.name,
+email:user.email
+});
+
+
+toast("Welcome back");
+
+
+setTimeout(()=>{
+location.href="profile.html";
+},700);
+
+
+});
+
+
+}
+
+
+
+
+
+/* ---------- Register ---------- */
+
+function initRegister(){
+
+const form=document.getElementById("registerForm");
+
+if(!form) return;
+
+
+form.addEventListener("submit",e=>{
+
+e.preventDefault();
+
+
+const name=
+document.getElementById("rgName").value.trim();
+
+
+const email=
+document.getElementById("rgEmail").value.trim().toLowerCase();
+
+
+const password=
+document.getElementById("rgPass").value;
+
+
+
+if(password.length < 6){
+
+toast("Password minimum 6 characters","err");
+
+return;
+
+}
+
+
+
+const users=getUsers();
+
+
+
+if(users.some(u=>u.email===email)){
+
+toast("Account already exists","err");
+
+return;
+
+}
+
+
+
+users.push({
+
+name:name,
+email:email,
+password:password
+
+});
+
+
+
+store.set("users",users);
+
+
+
+setUser({
+
+name:name,
+email:email
+
+});
+
+
+
+toast("Account created 🎉");
+
+
+
+setTimeout(()=>{
+
+location.href="profile.html";
+
+},700);
+
+
+
+});
+
+
+}
+
+
+
+
+
+/* ---------- Profile ---------- */
+
+function renderProfile(){
+
+
+const el=document.getElementById("profileBox");
+
+
+if(!el) return;
+
+
+
+const u=getUser();
+
+
+
+if(!u){
+
+el.innerHTML=`
+
+<div class="panel center">
+
+<h3>
+You are not logged in
+</h3>
+
+
+<a class="btn"
+href="login.html">
+
+Login
+
+</a>
+
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+
+el.innerHTML=`
+
+<div class="panel">
+
+
+<div class="avatar">
+${u.name.charAt(0).toUpperCase()}
+</div>
+
+
+<h3>
+${u.name}
+</h3>
+
+
+<p>
+${u.email}
+</p>
+
+
+
+<button class="btn"
+onclick="logout()">
+
+Logout
+
+</button>
+
+
+</div>
+
+`;
+
+
+
+}
+
+
+
+
+function logout(){
+
+localStorage.removeItem("user");
+
+toast("Logged out","info");
+
+
+setTimeout(()=>{
+
+location.reload();
+
+},500);
+
+
+}
