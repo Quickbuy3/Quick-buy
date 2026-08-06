@@ -1,912 +1,242 @@
-/* ================= Quick Buy — shared app logic (vanilla JS) ================= */
+/* ===== Quick Buy — professional mobile-first theme ===== */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
-/* ---------- Product catalog ---------- */
-const DEFAULT_PRODUCTS = [
-  { id: 1,  name: "Wireless Noise Cancelling Headphones", cat: "Electronics", price: 2499, mrp: 5999, rating: 4.4, reviews: 1820, tags: ["featured", "trending", "deal"], img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=70" },
-  { id: 2,  name: "Smart Fitness Watch with AMOLED Display", cat: "Electronics", price: 1899, mrp: 4999, rating: 4.2, reviews: 940, tags: ["featured", "new"], img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=70" },
-  { id: 3,  name: "Men's Casual Running Sneakers", cat: "Fashion", price: 1299, mrp: 2999, rating: 4.1, reviews: 610, tags: ["trending", "deal"], img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=70" },
-  { id: 4,  name: "Leather Analog Wrist Watch", cat: "Fashion", price: 999, mrp: 2499, rating: 4.3, reviews: 320, tags: ["featured"], img: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=600&q=70" },
-  { id: 5,  name: "DSLR Camera 24MP with Kit Lens", cat: "Electronics", price: 34999, mrp: 45999, rating: 4.6, reviews: 210, tags: ["featured", "new"], img: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=600&q=70" },
-  { id: 6,  name: "Backpack 30L Water Resistant", cat: "Fashion", price: 899, mrp: 1999, rating: 4.0, reviews: 480, tags: ["deal", "new"], img: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=70" },
-  { id: 7,  name: "Bluetooth Speaker Deep Bass", cat: "Electronics", price: 1499, mrp: 3499, rating: 4.2, reviews: 1120, tags: ["trending", "deal"], img: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600&q=70" },
-  { id: 8,  name: "Sunglasses UV400 Polarized", cat: "Fashion", price: 599, mrp: 1799, rating: 3.9, reviews: 260, tags: ["deal"], img: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=70" },
-  { id: 9,  name: "Non-Stick Cookware Set of 5", cat: "Home", price: 2199, mrp: 4499, rating: 4.3, reviews: 390, tags: ["featured", "deal"], img: "https://images.unsplash.com/photo-1584990347449-a2d4c2c9ec3f?w=600&q=70" },
-  { id: 10, name: "Cotton Bedsheet King Size", cat: "Home", price: 799, mrp: 1899, rating: 4.1, reviews: 520, tags: ["new"], img: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=70" },
-  { id: 11, name: "Vitamin C Face Serum 30ml", cat: "Beauty", price: 449, mrp: 999, rating: 4.4, reviews: 2100, tags: ["trending", "new"], img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&q=70" },
-  { id: 12, name: "Professional Hair Dryer 2000W", cat: "Beauty", price: 1099, mrp: 2299, rating: 4.0, reviews: 340, tags: ["deal"], img: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&q=70" },
-  { id: 13, name: "Yoga Mat Anti-Slip 6mm", cat: "Sports", price: 649, mrp: 1499, rating: 4.2, reviews: 700, tags: ["new", "trending"], img: "https://images.unsplash.com/photo-1592432678016-e910b452f9a2?w=600&q=70" },
-  { id: 14, name: "Adjustable Dumbbell Set 20kg", cat: "Sports", price: 3299, mrp: 5999, rating: 4.5, reviews: 180, tags: ["featured"], img: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=70" },
-  { id: 15, name: "Bestseller Novel Collection (3 Books)", cat: "Books", price: 799, mrp: 1499, rating: 4.7, reviews: 830, tags: ["new"], img: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&q=70" },
-  { id: 16, name: "Wooden Building Blocks for Kids", cat: "Toys", price: 549, mrp: 1299, rating: 4.3, reviews: 410, tags: ["trending", "deal"], img: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=600&q=70" },
-];
-
-const DEFAULT_CATEGORIES = [
-  { name: "Electronics", emoji: "📱" },
-  { name: "Fashion", emoji: "👕" },
-  { name: "Home", emoji: "🏠" },
-  { name: "Beauty", emoji: "💄" },
-  { name: "Sports", emoji: "🏀" },
-  { name: "Books", emoji: "📚" },
-  { name: "Toys", emoji: "🧸" },
-  { name: "Deals", emoji: "🔥" },
-];
-
-/* ---------- LocalStorage helpers (backwards compatible) ---------- */
-const store = {
-  get(k, def) { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } },
-  set(k, v) { localStorage.setItem(k, JSON.stringify(v)); },
-};
-const getCart = () => store.get("cart", []);
-const setCart = (c) => { store.set("cart", c); refreshBadges(); };
-const getWish = () => store.get("wishlist", []);
-const setWish = (w) => { store.set("wishlist", w); refreshBadges(); };
-const getOrders = () => store.get("orders", []);
-const setOrders = (o) => store.set("orders", o);
-const getUser = () => store.get("user", null);
-const setUser = (u) => store.set("user", u);
-const getUsers = () => store.get("users", []);
-/* ---------- Admin-managed catalog (falls back to defaults) ---------- */
-let PRODUCTS = store.get("qb_products", null) || DEFAULT_PRODUCTS.slice();
-let CATEGORIES = store.get("qb_categories", null) || DEFAULT_CATEGORIES.slice();
-const saveProducts = (list) => { PRODUCTS = list; store.set("qb_products", list); };
-const saveCategories = (list) => { CATEGORIES = list; store.set("qb_categories", list); };
-const DEFAULT_SETTINGS = { storeName: "Quick Buy", tagline: "Shop faster. Save more.", logo: "", phone: "+91 90000 00000", address: "Quick Buy HQ, India" };
-const getSettings = () => ({ ...DEFAULT_SETTINGS, ...store.get("qb_settings", {}) });
-const setSettings = (s) => store.set("qb_settings", s);
-const getNotifications = () => store.get("qb_notifications", []);
-const setNotifications = (n) => store.set("qb_notifications", n);
-
-const productById = (id) => PRODUCTS.find((p) => p.id === Number(id));
-const money = (n) => "₹" + Number(n).toLocaleString("en-IN");
-const discount = (p) => Math.round(((p.mrp - p.price) / p.mrp) * 100);
-
-/* ---------- Toasts ---------- */
-function toast(msg, type = "ok") {
-  let stack = document.querySelector(".toast-stack");
-  if (!stack) { stack = document.createElement("div"); stack.className = "toast-stack"; document.body.appendChild(stack); }
-  const icons = { ok: "✅", err: "⚠️", info: "🛍️" };
-  const el = document.createElement("div");
-  el.className = "toast " + type;
-  el.innerHTML = `<span>${icons[type] || ""}</span><span>${msg}</span>`;
-  stack.appendChild(el);
-  setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 250); }, 2200);
+:root {
+  --orange: #ff7a00;
+  --orange-dark: #e56800;
+  --orange-soft: #fff2e5;
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --text: #16181d;
+  --muted: #6b7280;
+  --border: #e8eaee;
+  --green: #16a34a;
+  --red: #e11d48;
+  --radius: 14px;
+  --shadow: 0 2px 10px rgba(16, 24, 40, 0.06);
+  --shadow-lg: 0 10px 30px rgba(16, 24, 40, 0.12);
+  --header-h: 108px;
 }
 
-/* ---------- Theme ---------- */
-function applyTheme(t) {
-  document.documentElement.setAttribute("data-theme", t);
-  localStorage.setItem("theme", t);
-  document.querySelectorAll("[data-theme-icon]").forEach((b) => (b.textContent = t === "dark" ? "☀️" : "🌙"));
-}
-function toggleTheme() {
-  const next = (localStorage.getItem("theme") || "light") === "dark" ? "light" : "dark";
-  applyTheme(next);
-  toast(next === "dark" ? "Dark mode on" : "Light mode on", "info");
-}
-applyTheme(localStorage.getItem("theme") || "light");
-
-/* ---------- Cart / Wishlist actions ---------- */
-function addToCart(id, qty = 1, silent = false) {
-  const cart = getCart();
-  const line = cart.find((i) => i.id === Number(id));
-  if (line) line.qty += qty; else cart.push({ id: Number(id), qty });
-  setCart(cart);
-  if (!silent) toast(`${productById(id).name.slice(0, 24)}… added to cart`);
-}
-function removeFromCart(id) { setCart(getCart().filter((i) => i.id !== Number(id))); toast("Removed from cart", "info"); }
-function changeQty(id, delta) {
-  const cart = getCart();
-  const line = cart.find((i) => i.id === Number(id));
-  if (!line) return;
-  line.qty += delta;
-  if (line.qty < 1) return removeFromCart(id);
-  setCart(cart);
-}
-function toggleWish(id) {
-  id = Number(id);
-  let w = getWish();
-  const has = w.includes(id);
-  w = has ? w.filter((x) => x !== id) : [...w, id];
-  setWish(w);
-  toast(has ? "Removed from wishlist" : "Saved to wishlist ❤️", has ? "info" : "ok");
-  document.querySelectorAll(`.wish-btn[data-wish="${id}"]`).forEach((b) => b.classList.toggle("on", !has));
-  if (document.body.dataset.page === "wishlist") renderWishlist();
-}
-const cartCount = () => getCart().reduce((s, i) => s + i.qty, 0);
-const cartTotal = () => getCart().reduce((s, i) => s + (productById(i.id)?.price || 0) * i.qty, 0);
-
-function refreshBadges() {
-  const c = cartCount(), w = getWish().length;
-  document.querySelectorAll("[data-cart-badge]").forEach((e) => { e.textContent = c; e.style.display = c ? "grid" : "none"; });
-  document.querySelectorAll("[data-wish-badge]").forEach((e) => { e.textContent = w; e.style.display = w ? "grid" : "none"; });
+html[data-theme="dark"] {
+  --orange: #ff8c1a;
+  --orange-dark: #ff7a00;
+  --orange-soft: #33240f;
+  --bg: #0e1116;
+  --surface: #171b22;
+  --text: #f2f4f7;
+  --muted: #9aa3b2;
+  --border: #262c36;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.55);
 }
 
-/* ---------- Shared chrome ---------- */
-function headerHTML(title) {
-  const S = getSettings();
-  return `
-  <header class="app-header">
-    <div class="container">
-      <div class="header-row">
-        <a class="logo" href="index.html">
-          ${S.logo ? `<img class="logo-img" src="${S.logo}" alt="${S.storeName}" />` : `<span class="logo-mark">${S.storeName.charAt(0).toUpperCase()}</span>`}
-          <span>${S.storeName}<small>${title || S.tagline}</small></span>
-        </a>
-        <div class="header-actions">
-          <button class="icon-btn" data-theme-icon onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
-          <a class="icon-btn" href="wishlist.html" aria-label="Wishlist">❤️<span class="badge" data-wish-badge style="display:none">0</span></a>
-          <a class="icon-btn" href="cart.html" aria-label="Cart">🛒<span class="badge" data-cart-badge style="display:none">0</span></a>
-        </div>
-      </div>
-      <div class="search-wrap">
-        <span class="s-icon">🔍</span>
-        <input id="globalSearch" type="search" placeholder="Search products, brands and more" />
-      </div>
-    </div>
-  </header>`;
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding-bottom: 78px;
+  transition: background .25s ease, color .25s ease;
 }
 
-function bottomNavHTML(active) {
-  const items = [
-    ["home", "index.html", "🏠", "Home"],
-    ["categories", "categories.html", "🗂️", "Categories"],
-    ["wishlist", "wishlist.html", "❤️", "Wishlist"],
-    ["cart", "cart.html", "🛒", "Cart"],
-    ["account", "profile.html", "👤", "Account"],
-  ];
-  return `<nav class="bottom-nav">${items
-    .map(([key, href, ico, label]) => {
-      const badge =
-        key === "cart" ? `<span class="nav-badge" data-cart-badge style="display:none">0</span>` :
-        key === "wishlist" ? `<span class="nav-badge" data-wish-badge style="display:none">0</span>` : "";
-      return `<a href="${href}" class="${active === key ? "active" : ""}"><span class="ico">${ico}</span>${badge}<span>${label}</span></a>`;
-    })
-    .join("")}</nav>`;
-}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; }
 
-function mountChrome(activeNav, headerTitle) {
-  const h = document.getElementById("header-slot");
-  if (h) h.innerHTML = headerHTML(headerTitle);
-  const n = document.getElementById("nav-slot");
-  if (n) n.innerHTML = bottomNavHTML(activeNav);
-  refreshBadges();
-  renderNotifications();
-  const s = document.getElementById("globalSearch");
-  if (s) {
-    const params = new URLSearchParams(location.search);
-    if (params.get("q")) s.value = params.get("q");
-    s.addEventListener("input", (e) => {
-      if (document.body.dataset.page === "home" || document.body.dataset.page === "categories") {
-        renderSearch(e.target.value);
-      }
-    });
-    s.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && document.body.dataset.page !== "home") {
-        location.href = "index.html?q=" + encodeURIComponent(e.target.value);
-      }
-    });
-  }
-}
+.container { max-width: 1100px; margin: 0 auto; padding: 0 14px; }
 
-/* ---------- Product card ---------- */
-function cardHTML(p) {
-  const wished = getWish().includes(p.id);
-  return `
-  <article class="card">
-    <a class="card-img" href="product.html?id=${p.id}">
-      <img src="${p.img}" alt="${p.name}" loading="lazy" />
-      <span class="off-tag">${discount(p)}% OFF</span>
-    </a>
-    <button class="wish-btn ${wished ? "on" : ""}" data-wish="${p.id}" onclick="toggleWish(${p.id})" aria-label="Wishlist">❤</button>
-    <div class="card-body">
-      <a class="card-name" href="product.html?id=${p.id}">${p.name}</a>
-      <div class="rating"><span class="stars">${p.rating} ★</span><span>(${p.reviews})</span></div>
-      <div class="price-row">
-        <span class="price">${money(p.price)}</span>
-        <span class="mrp">${money(p.mrp)}</span>
-        <span class="off">${discount(p)}% off</span>
-      </div>
-      <button class="btn block" onclick="addToCart(${p.id})">Add to Cart</button>
-    </div>
-  </article>`;
+/* ===== Header ===== */
+.app-header {
+  position: sticky; top: 0; z-index: 50;
+  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  color: #fff;
+  padding: 10px 0 12px;
+  box-shadow: var(--shadow);
 }
-const renderInto = (sel, list, cls) => {
-  const el = document.querySelector(sel);
-  if (el) el.innerHTML = list.map(cardHTML).join("");
-};
+.header-row { display: flex; align-items: center; gap: 12px; }
+.logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 20px; letter-spacing: -.4px; }
+.logo-mark {
+  width: 32px; height: 32px; border-radius: 10px; background: #fff; color: var(--orange);
+  display: grid; place-items: center; font-size: 18px; font-weight: 800; flex-shrink: 0;
+}
+.logo small { display: block; font-size: 10px; font-weight: 500; opacity: .9; letter-spacing: .5px; }
+.header-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 50%; border: 0; cursor: pointer;
+  background: rgba(255,255,255,.18); color: #fff; font-size: 17px;
+  display: grid; place-items: center; position: relative; transition: transform .15s, background .2s;
+}
+.icon-btn:active { transform: scale(.9); }
+.badge {
+  position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 4px;
+  border-radius: 9px; background: #fff; color: var(--orange);
+  font-size: 11px; font-weight: 700; display: grid; place-items: center;
+}
+.search-wrap { margin-top: 10px; position: relative; }
+.search-wrap input {
+  width: 100%; border: 0; border-radius: 12px; padding: 12px 14px 12px 40px;
+  background: #fff; color: #16181d; outline: none; box-shadow: var(--shadow);
+}
+.search-wrap .s-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #98a2b3; }
 
-/* ---------- Home ---------- */
-function renderHome() {
-  document.querySelector("#cats").innerHTML = CATEGORIES.map(
-    (c) => `<a class="cat" href="categories.html?cat=${encodeURIComponent(c.name)}"><div class="emoji">${c.emoji}</div><span>${c.name}</span></a>`
-  ).join("");
-  renderInto("#featured", PRODUCTS.filter((p) => p.tags.includes("featured")));
-  renderInto("#trending", PRODUCTS.filter((p) => p.tags.includes("trending")));
-  renderInto("#arrivals", PRODUCTS.filter((p) => p.tags.includes("new")));
-  renderInto("#deals", PRODUCTS.filter((p) => p.tags.includes("deal")).sort((a, b) => discount(b) - discount(a)));
-  const q = new URLSearchParams(location.search).get("q");
-  if (q) renderSearch(q);
-  startSlider();
-}
+/* ===== Sections ===== */
+.section { margin-top: 22px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.section-head h2 { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -.3px; }
+.section-head .link { color: var(--orange); font-size: 13px; font-weight: 600; }
 
-function renderSearch(q) {
-  const box = document.getElementById("searchResults");
-  const rest = document.getElementById("homeSections");
-  if (!box) return;
-  q = (q || "").trim().toLowerCase();
-  if (!q) { box.innerHTML = ""; box.style.display = "none"; if (rest) rest.style.display = ""; return; }
-  const hits = PRODUCTS.filter((p) => (p.name + " " + p.cat).toLowerCase().includes(q));
-  box.style.display = "";
-  if (rest) rest.style.display = "none";
-  box.innerHTML = `<div class="section"><div class="section-head"><h2>${hits.length} result${hits.length === 1 ? "" : "s"} for “${q}”</h2></div>
-    ${hits.length ? `<div class="grid">${hits.map(cardHTML).join("")}</div>` : `<div class="empty"><div class="big">🔍</div><p>No products matched your search.</p></div>`}</div>`;
+/* ===== Banner slider ===== */
+.slider { margin-top: 16px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); position: relative; }
+.slides { display: flex; transition: transform .55s cubic-bezier(.4,0,.2,1); }
+.slide { min-width: 100%; position: relative; }
+.slide img { width: 100%; height: 170px; object-fit: cover; }
+.slide-caption {
+  position: absolute; inset: auto 0 0 0; padding: 14px;
+  background: linear-gradient(transparent, rgba(0,0,0,.65)); color: #fff;
 }
+.slide-caption strong { display: block; font-size: 17px; }
+.slide-caption span { font-size: 12px; opacity: .9; }
+.dots { position: absolute; bottom: 8px; right: 12px; display: flex; gap: 5px; }
+.dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.5); transition: .3s; }
+.dots i.on { background: #fff; width: 18px; border-radius: 4px; }
 
-/* ---------- Auto slider ---------- */
-function startSlider() {
-  const track = document.querySelector(".slides");
-  if (!track) return;
-  const total = track.children.length;
-  const dots = document.querySelector(".dots");
-  dots.innerHTML = Array.from({ length: total }, (_, i) => `<i class="${i === 0 ? "on" : ""}"></i>`).join("");
-  let i = 0, timer;
-  const go = (n) => {
-    i = (n + total) % total;
-    track.style.transform = `translateX(-${i * 100}%)`;
-    [...dots.children].forEach((d, k) => d.classList.toggle("on", k === i));
-  };
-  const play = () => (timer = setInterval(() => go(i + 1), 3500));
-  play();
-  let startX = 0;
-  track.parentElement.addEventListener("touchstart", (e) => { startX = e.touches[0].clientX; clearInterval(timer); }, { passive: true });
-  track.parentElement.addEventListener("touchend", (e) => {
-    const dx = e.changedTouches[0].clientX - startX;
-    if (Math.abs(dx) > 40) go(i + (dx < 0 ? 1 : -1));
-    play();
-  });
+/* ===== Categories ===== */
+.cats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.cat {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 6px; text-align: center; transition: transform .18s, box-shadow .2s; cursor: pointer;
 }
+.cat:active { transform: scale(.95); }
+.cat:hover { box-shadow: var(--shadow); }
+.cat .emoji { font-size: 24px; }
+.cat span { display: block; margin-top: 6px; font-size: 11px; font-weight: 600; color: var(--muted); }
 
-/* ---------- Categories page ---------- */
-function renderCategories() {
-  const params = new URLSearchParams(location.search);
-  const active = params.get("cat") || "All";
-  const chips = ["All", ...CATEGORIES.map((c) => c.name)];
-  document.getElementById("catChips").innerHTML = chips
-    .map((c) => `<a class="chip" style="${c === active ? "background:var(--orange);color:#fff" : ""}" href="categories.html?cat=${encodeURIComponent(c)}">${c}</a>`)
-    .join("");
-  let list = PRODUCTS;
-  if (active === "Deals") list = PRODUCTS.filter((p) => p.tags.includes("deal"));
-  else if (active !== "All") list = PRODUCTS.filter((p) => p.cat === active);
-  document.getElementById("catTitle").textContent = active + " (" + list.length + ")";
-  renderInto("#catGrid", list);
-}
+/* ===== Product grid & cards ===== */
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.rail { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.rail::-webkit-scrollbar { display: none; }
+.rail .card { min-width: 158px; scroll-snap-align: start; }
 
-/* ---------- Product details ---------- */
-function renderProduct() {
-  const id = new URLSearchParams(location.search).get("id");
-  const p = productById(id);
-  const root = document.getElementById("pd");
-  if (!p) { root.innerHTML = `<div class="empty"><div class="big">😕</div><p>Product not found.</p><a class="btn" href="index.html">Back to home</a></div>`; return; }
-  document.title = p.name + " — Quick Buy";
-  const wished = getWish().includes(p.id);
-  root.innerHTML = `
-    <div class="pd-img"><img src="${p.img}" alt="${p.name}" /></div>
-    <div class="section">
-      <div class="chips"><span class="chip">${p.cat}</span>${p.tags.map((t) => `<span class="chip">${t}</span>`).join("")}</div>
-      <h1 class="page-title" style="margin-top:10px">${p.name}</h1>
-      <div class="rating"><span class="stars">${p.rating} ★</span><span>${p.reviews} ratings</span></div>
-      <div class="price-row" style="margin-top:10px">
-        <span class="price" style="font-size:24px">${money(p.price)}</span>
-        <span class="mrp">${money(p.mrp)}</span>
-        <span class="off">${discount(p)}% off</span>
-      </div>
-      <p class="muted" style="margin-top:10px">Inclusive of all taxes · Free delivery in 2-4 days · 7-day easy return. Genuine product with 1 year warranty, backed by Quick Buy buyer protection.</p>
-      <div class="panel" style="margin-top:14px">
-        <div class="summary-line"><span>Delivery</span><b>FREE</b></div>
-        <div class="summary-line"><span>You save</span><b style="color:var(--green)">${money(p.mrp - p.price)}</b></div>
-        <div class="summary-line"><span>In stock</span><b>Yes</b></div>
-      </div>
-    </div>
-    <div class="pd-actions">
-      <button class="btn outline lg" onclick="toggleWish(${p.id})">${wished ? "♥ Wishlisted" : "♡ Wishlist"}</button>
-      <button class="btn lg" onclick="addToCart(${p.id})">Add to Cart</button>
-    </div>
-    <div class="section">
-      <div class="section-head"><h2>Similar products</h2></div>
-      <div class="rail">${PRODUCTS.filter((x) => x.cat === p.cat && x.id !== p.id).map(cardHTML).join("") || "<p class='muted'>Nothing similar yet.</p>"}</div>
-    </div>`;
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; display: flex; flex-direction: column; position: relative;
+  animation: fadeUp .35s ease both; transition: transform .18s, box-shadow .25s;
 }
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.card-img { position: relative; background: var(--orange-soft); }
+.card-img img { width: 100%; height: 140px; object-fit: cover; }
+.off-tag {
+  position: absolute; top: 8px; left: 8px; background: var(--red); color: #fff;
+  font-size: 11px; font-weight: 700; padding: 3px 7px; border-radius: 6px;
+}
+.wish-btn {
+  position: absolute; top: 6px; right: 6px; width: 32px; height: 32px; border-radius: 50%;
+  border: 0; background: rgba(255,255,255,.92); color: #98a2b3; cursor: pointer; font-size: 15px;
+  display: grid; place-items: center; transition: transform .15s;
+}
+.wish-btn.on { color: var(--red); }
+.wish-btn:active { transform: scale(.85); }
+.card-body { padding: 10px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.card-name { font-size: 13px; font-weight: 600; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rating { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.stars { background: var(--green); color: #fff; padding: 1px 5px; border-radius: 4px; font-weight: 700; font-size: 10px; }
+.price-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.price { font-size: 15px; font-weight: 800; }
+.mrp { font-size: 12px; color: var(--muted); text-decoration: line-through; }
+.off { font-size: 12px; color: var(--green); font-weight: 700; }
+.btn {
+  border: 0; border-radius: 10px; padding: 9px 12px; font-weight: 700; font-size: 13px;
+  cursor: pointer; background: var(--orange); color: #fff; transition: transform .15s, filter .2s;
+}
+.btn:active { transform: scale(.96); }
+.btn:hover { filter: brightness(1.05); }
+.btn.block { width: 100%; }
+.btn.ghost { background: var(--orange-soft); color: var(--orange); }
+.btn.outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn.lg { padding: 13px; font-size: 15px; }
 
-/* ---------- Cart ---------- */
-function renderCart() {
-  const items = getCart();
-  const list = document.getElementById("cartList");
-  const summary = document.getElementById("cartSummary");
-  if (!items.length) {
-    list.innerHTML = `<div class="empty"><div class="big">🛒</div><p>Your cart is empty.</p><a class="btn" href="index.html">Start shopping</a></div>`;
-    summary.innerHTML = "";
-    return;
-  }
-  list.innerHTML = items.map((i) => {
-    const p = productById(i.id);
-    if (!p) return "";
-    return `<div class="row-item">
-      <img src="${p.img}" alt="${p.name}" />
-      <div class="info">
-        <a class="card-name" href="product.html?id=${p.id}">${p.name}</a>
-        <div class="price-row"><span class="price">${money(p.price)}</span><span class="mrp">${money(p.mrp)}</span><span class="off">${discount(p)}% off</span></div>
-        <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
-          <div class="qty"><button onclick="changeQty(${p.id},-1);renderCart()">−</button><b>${i.qty}</b><button onclick="changeQty(${p.id},1);renderCart()">+</button></div>
-          <button class="link-danger" onclick="removeFromCart(${p.id});renderCart()">Remove</button>
-        </div>
-      </div>
-    </div>`;
-  }).join("");
-  const total = cartTotal();
-  const mrpTotal = items.reduce((s, i) => s + (productById(i.id)?.mrp || 0) * i.qty, 0);
-  summary.innerHTML = `<div class="panel">
-    <div class="summary-line"><span>Price (${cartCount()} items)</span><span>${money(mrpTotal)}</span></div>
-    <div class="summary-line"><span>Discount</span><span style="color:var(--green)">− ${money(mrpTotal - total)}</span></div>
-    <div class="summary-line"><span>Delivery</span><span style="color:var(--green)">FREE</span></div>
-    <div class="summary-line total"><span>Total</span><span>${money(total)}</span></div>
-    <a class="btn block lg" style="display:block;text-align:center;margin-top:12px" href="checkout.html">Proceed to Checkout</a>
-  </div>`;
-}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-/* ---------- Wishlist ---------- */
-function renderWishlist() {
-  const ids = getWish();
-  const el = document.getElementById("wishGrid");
-  if (!ids.length) {
-    el.innerHTML = `<div class="empty"><div class="big">❤️</div><p>No saved items yet.</p><a class="btn" href="index.html">Browse products</a></div>`;
-    return;
-  }
-  el.innerHTML = `<div class="grid">${ids.map(productById).filter(Boolean).map(cardHTML).join("")}</div>`;
+/* ===== Panels / forms ===== */
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+.page-title { font-size: 21px; font-weight: 800; margin: 18px 0 12px; }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text); outline: none; transition: border-color .2s;
 }
+.field input:focus { border-color: var(--orange); }
+.muted { color: var(--muted); font-size: 13px; }
+.center { text-align: center; }
+.empty { text-align: center; padding: 50px 16px; color: var(--muted); }
+.empty .big { font-size: 46px; }
 
-/* ---------- Checkout ---------- */
-function renderCheckout() {
-  const items = getCart();
-  const box = document.getElementById("checkoutSummary");
-  if (!items.length) {
-    document.getElementById("checkoutBody").innerHTML = `<div class="empty"><div class="big">🧾</div><p>Nothing to checkout.</p><a class="btn" href="index.html">Shop now</a></div>`;
-    return;
-  }
-  box.innerHTML = `<div class="panel">
-    ${items.map((i) => { const p = productById(i.id); return `<div class="summary-line"><span>${p.name.slice(0, 26)}… × ${i.qty}</span><span>${money(p.price * i.qty)}</span></div>`; }).join("")}
-    <div class="summary-line total"><span>Total payable</span><span>${money(cartTotal())}</span></div>
-  </div>`;
-  const u = getUser();
-  if (u) { document.getElementById("coName").value = u.name || ""; document.getElementById("coEmail").value = u.email || ""; }
-  document.getElementById("checkoutForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const f = e.target;
-    if (!f.checkValidity()) { toast("Please fill all required fields", "err"); return; }
-    const order = {
-      id: "QB" + Date.now().toString().slice(-8),
-      date: new Date().toISOString(),
-      items: getCart().map((i) => ({ ...i, name: productById(i.id).name, price: productById(i.id).price, img: productById(i.id).img })),
-      total: cartTotal(),
-      name: (document.getElementById("coName").value || "").trim(),
-      phone: (document.getElementById("coPhone")?.value || "").trim(),
-      address: document.getElementById("coAddress").value,
-      payment: document.getElementById("coPayment").value,
-      email: (document.getElementById("coEmail").value || "").trim().toLowerCase(),
-      status: "Confirmed",
-    };
-    saveOrder(order);
-    setCart([]);
-    toast("Order placed successfully 🎉");
-    setTimeout(() => (location.href = "orders.html"), 900);
-  });
-}
+/* ===== Cart / list rows ===== */
+.row-item { display: flex; gap: 12px; padding: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; animation: fadeUp .3s ease both; }
+.row-item img { width: 78px; height: 78px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.row-item .info { flex: 1; min-width: 0; }
+.qty { display: inline-flex; align-items: center; gap: 10px; border: 1px solid var(--border); border-radius: 8px; padding: 3px 8px; }
+.qty button { border: 0; background: none; color: var(--orange); font-size: 16px; font-weight: 800; cursor: pointer; }
+.link-danger { background: none; border: 0; color: var(--red); font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; }
+.summary-line { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
+.summary-line.total { font-weight: 800; font-size: 17px; border-top: 1px dashed var(--border); margin-top: 6px; padding-top: 10px; }
 
-/* Persist a single order (newest first) — never overwrites existing orders */
-function saveOrder(order) {
-  if (!order || !order.items || !order.items.length) return false;
-  setOrders([order, ...getOrders()]);
-  return true;
+/* ===== Bottom nav ===== */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
 }
+.bottom-nav a { display: grid; justify-items: center; gap: 2px; font-size: 10px; font-weight: 600; color: var(--muted); position: relative; padding: 4px 0; }
+.bottom-nav a .ico { font-size: 19px; transition: transform .18s; }
+.bottom-nav a.active { color: var(--orange); }
+.bottom-nav a.active .ico { transform: translateY(-2px) scale(1.1); }
+.nav-badge { position: absolute; top: 0; right: 22%; background: var(--orange); color: #fff; font-size: 9px; font-weight: 700; min-width: 15px; height: 15px; border-radius: 8px; display: grid; place-items: center; padding: 0 3px; }
 
+/* ===== Toast ===== */
+.toast-stack { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%); z-index: 90; display: grid; gap: 8px; width: min(92vw, 380px); }
+.toast {
+  background: #16181d; color: #fff; border-radius: 12px; padding: 12px 14px; font-size: 13.5px; font-weight: 600;
+  box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 9px;
+  animation: toastIn .28s cubic-bezier(.2,.9,.3,1.4) both;
+}
+.toast.out { animation: toastOut .25s ease both; }
+.toast.ok { background: #12291c; border-left: 4px solid var(--green); }
+.toast.err { background: #2c1218; border-left: 4px solid var(--red); }
+.toast.info { background: #2a1c0c; border-left: 4px solid var(--orange); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(16px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(10px); } }
 
-/* ---------- Orders ---------- */
-function renderOrders() {
-  const orders = getOrders();
-  const el = document.getElementById("ordersList");
-  if (!orders.length) {
-    el.innerHTML = `<div class="empty"><div class="big">📦</div><p>No orders yet.</p><a class="btn" href="index.html">Start shopping</a></div>`;
-    return;
-  }
-  el.innerHTML = orders.map((o) => `
-    <div class="panel" style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <b>#${o.id}</b><span class="status ${o.status === "Delivered" ? "done" : ""}">${o.status}</span>
-      </div>
-      <p class="muted" style="margin:6px 0 10px">Placed on ${new Date(o.date).toLocaleDateString()} · ${o.payment}</p>
-      ${o.items.map((i) => `<div class="row-item" style="margin-bottom:8px">
-          <img src="${i.img}" alt="${i.name}" />
-          <div class="info"><div class="card-name">${i.name}</div><div class="muted">Qty ${i.qty} · ${money(i.price * i.qty)}</div></div>
-        </div>`).join("")}
-      <div class="summary-line total"><span>Total</span><span>${money(o.total)}</span></div>
-      <p class="muted" style="margin-top:8px">Deliver to: ${o.address}</p>
-    </div>`).join("");
-}
+/* ===== Product details ===== */
+.pd-img { border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+.pd-img img { width: 100%; height: 300px; object-fit: cover; }
+.pd-actions { position: sticky; bottom: 78px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { background: var(--orange-soft); color: var(--orange); font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 20px; }
 
-/* ---------- Auth (session persisted in LocalStorage) ---------- */
-/* login(email, password) -> true on success. Used by the login form. */
-function login(email, password) {
-  email = (email || "").trim().toLowerCase();
-  const found = getUsers().find((u) => u.email === email && u.password === password);
-  if (!found) { toast("Invalid email or password", "err"); return false; }
-  setUser({ name: found.name, email: found.email });
-  toast("Welcome back, " + found.name.split(" ")[0] + "!");
-  return true;
-}
+/* ===== Orders ===== */
+.status { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: var(--orange-soft); color: var(--orange); }
+.status.done { background: rgba(22,163,74,.12); color: var(--green); }
 
-/* register(name, email, password) -> true on success. */
-function register(name, email, password) {
-  name = (name || "").trim();
-  email = (email || "").trim().toLowerCase();
-  if (!name || !email) { toast("Please fill all fields", "err"); return false; }
-  if (!password || password.length < 6) { toast("Password must be at least 6 characters", "err"); return false; }
-  const users = getUsers();
-  if (users.some((u) => u.email === email)) { toast("Account already exists. Please login.", "err"); return false; }
-  users.push({ name, email, password });
-  store.set("users", users);
-  setUser({ name, email });
-  toast("Account created 🎉");
-  return true;
+/* ===== Profile ===== */
+.avatar { width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); color: #fff; display: grid; place-items: center; font-size: 24px; font-weight: 800; }
+.menu-list { margin-top: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.menu-list a, .menu-list button {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  padding: 14px 16px; border: 0; border-bottom: 1px solid var(--border); background: none; color: var(--text);
+  font-size: 14px; font-weight: 600; cursor: pointer;
 }
+.menu-list a:last-child, .menu-list button:last-child { border-bottom: 0; }
+.menu-list .arrow { margin-left: auto; color: var(--muted); }
 
-function initLogin() {
-  const form = document.getElementById("loginForm");
-  if (!form || form.dataset.bound) return; // avoid duplicate listeners
-  form.dataset.bound = "1";
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    if (login(document.getElementById("lgEmail").value, document.getElementById("lgPass").value)) {
-      setTimeout(() => (location.href = "profile.html"), 800);
-    }
-  });
-}
-
-function initRegister() {
-  const form = document.getElementById("registerForm");
-  if (!form || form.dataset.bound) return; // avoid duplicate listeners
-  form.dataset.bound = "1";
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    if (register(document.getElementById("rgName").value, document.getElementById("rgEmail").value, document.getElementById("rgPass").value)) {
-      setTimeout(() => (location.href = "profile.html"), 800);
-    }
-  });
-}
-
-function logout() {
-  localStorage.removeItem("user");
-  store.set("qb_admin_session", false); // admin access never survives a user logout
-  toast("Logged out", "info");
-  setTimeout(() => location.reload(), 700);
-}
-
-
-/* ---------- Profile ---------- */
-function renderProfile() {
-  const u = getUser();
-  const el = document.getElementById("profileBox");
-  if (!u) {
-    el.innerHTML = `<div class="panel center">
-      <div class="big" style="font-size:44px">👤</div>
-      <h3 style="margin:8px 0">You are not logged in</h3>
-      <p class="muted">Login to track orders, save addresses and sync your wishlist.</p>
-      <div style="display:grid;gap:10px;margin-top:14px">
-        <a class="btn lg" href="login.html">Login</a>
-        <a class="btn outline lg" href="register.html">Create account</a>
-      </div>
-    </div>`;
-  } else {
-    el.innerHTML = `<div class="panel" style="display:flex;gap:14px;align-items:center">
-        <div class="avatar">${u.name.charAt(0).toUpperCase()}</div>
-        <div class="info"><b style="font-size:17px">${u.name}</b><div class="muted">${u.email}</div></div>
-      </div>`;
-  }
-  document.getElementById("profileStats").innerHTML = `
-    <div class="panel center"><b style="font-size:20px">${getOrders().length}</b><div class="muted">Orders</div></div>
-    <div class="panel center"><b style="font-size:20px">${getWish().length}</b><div class="muted">Wishlist</div></div>
-    <div class="panel center"><b style="font-size:20px">${cartCount()}</b><div class="muted">In cart</div></div>`;
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) logoutBtn.style.display = getUser() ? "flex" : "none";
-  /* Admin Panel entry is visible only to the admin account — normal users never see it */
-  const adminLink = document.getElementById("adminLink");
-  if (adminLink) adminLink.style.display = isAdmin() ? "flex" : "none";
-}
-
-
-/* ---------- User notification banners (sent from Admin Panel) ---------- */
-function renderNotifications() {
-  const list = getNotifications();
-  if (!list.length) return;
-  const seen = store.get("qb_notif_seen", []);
-  const fresh = list.filter((n) => !seen.includes(n.id));
-  if (!fresh.length) return;
-  let wrap = document.getElementById("notifBar");
-  if (!wrap) {
-    wrap = document.createElement("div");
-    wrap.id = "notifBar";
-    wrap.className = "notif-bar container";
-    const main = document.querySelector("main") || document.body;
-    main.insertBefore(wrap, main.firstChild);
-  }
-  wrap.innerHTML = fresh
-    .map((n) => `<div class="notif" data-id="${n.id}"><span class="notif-ico">🔔</span><div><b>${n.title}</b><p>${n.body}</p></div><button class="notif-x" onclick="dismissNotification('${n.id}')">✕</button></div>`)
-    .join("");
-}
-function dismissNotification(id) {
-  const seen = store.get("qb_notif_seen", []);
-  seen.push(id);
-  store.set("qb_notif_seen", seen);
-  const el = document.querySelector(`.notif[data-id="${id}"]`);
-  if (el) el.remove();
-}
-
-/* ================= ADMIN PANEL ================= */
-const ADMIN_DEFAULT = { email: "admin@quickbuy.com", password: "admin123" };
-const getAdmin = () => store.get("qb_admin", ADMIN_DEFAULT);
-const isAdminLoggedIn = () => store.get("qb_admin_session", false) === true;
-
-function initAdmin() {
-  renderAdminBrand();
-  if (isAdminLoggedIn()) showAdminApp();
-  else showAdminLogin();
-  const f = document.getElementById("adminLoginForm");
-  if (f) f.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("adEmail").value.trim().toLowerCase();
-    const pass = document.getElementById("adPass").value;
-    const a = getAdmin();
-    if (email !== a.email.toLowerCase() || pass !== a.password) return toast("Invalid admin credentials", "err");
-    store.set("qb_admin_session", true);
-    toast("Welcome, Admin");
-    showAdminApp();
-  });
-}
-function adminLogout() { store.set("qb_admin_session", false); toast("Admin logged out", "info"); showAdminLogin(); }
-function showAdminLogin() {
-  document.getElementById("adminLogin").style.display = "";
-  document.getElementById("adminApp").style.display = "none";
-}
-function showAdminApp() {
-  document.getElementById("adminLogin").style.display = "none";
-  document.getElementById("adminApp").style.display = "";
-  adminTab("dashboard");
-}
-function adminTab(tab) {
-  document.querySelectorAll(".admin-tab").forEach((b) => b.classList.toggle("on", b.dataset.tab === tab));
-  const map = { dashboard: adminDashboard, products: adminProducts, categories: adminCategories, orders: adminOrders, users: adminUsers, notifications: adminNotifications, settings: adminSettings };
-  (map[tab] || adminDashboard)();
-}
-const adminView = (html) => (document.getElementById("adminView").innerHTML = html);
-
-function adminDashboard() {
-  const orders = getOrders();
-  const revenue = orders.reduce((s, o) => s + (o.total || 0), 0);
-  adminView(`
-    <div class="admin-stats">
-      <div class="stat"><span class="stat-ico">📦</span><b>${PRODUCTS.length}</b><span>Total Products</span></div>
-      <div class="stat"><span class="stat-ico">🧾</span><b>${orders.length}</b><span>Total Orders</span></div>
-      <div class="stat"><span class="stat-ico">👥</span><b>${getUsers().length}</b><span>Total Users</span></div>
-      <div class="stat"><span class="stat-ico">💰</span><b>${money(revenue)}</b><span>Total Revenue</span></div>
-    </div>
-    <div class="panel" style="margin-top:14px">
-      <h3 style="margin:0 0 8px">Recent orders</h3>
-      ${orders.slice(0, 5).map((o) => `<div class="summary-line"><span>#${o.id}</span><span>${money(o.total)} · <span class="status ${o.status === "Delivered" ? "done" : ""}">${o.status}</span></span></div>`).join("") || `<p class="muted">No orders yet.</p>`}
-    </div>
-    <div class="panel" style="margin-top:12px">
-      <h3 style="margin:0 0 8px">Categories</h3>
-      <div class="chips">${CATEGORIES.map((c) => `<span class="chip">${c.emoji} ${c.name}</span>`).join("")}</div>
-    </div>`);
-}
-
-/* ----- Products ----- */
-function adminProducts() {
-  adminView(`
-    <div class="admin-head">
-      <h3>Products (${PRODUCTS.length})</h3>
-      <button class="btn" onclick="adminProductForm()">+ Add Product</button>
-    </div>
-    <div id="adminProductForm"></div>
-    <div class="admin-list">
-      ${PRODUCTS.map((p) => `<div class="row-item">
-        <img src="${p.img}" alt="${p.name}" />
-        <div class="info">
-          <div class="card-name">${p.name}</div>
-          <div class="muted">${p.cat} · ${money(p.price)} · ⭐ ${p.rating}</div>
-          <div style="display:flex;gap:10px;margin-top:8px">
-            <button class="btn ghost" onclick="adminProductForm(${p.id})">Edit</button>
-            <button class="link-danger" onclick="adminDeleteProduct(${p.id})">Delete</button>
-          </div>
-        </div>
-      </div>`).join("") || `<p class="muted">No products.</p>`}
-    </div>`);
-}
-function adminProductForm(id) {
-  const p = id ? productById(id) : null;
-  document.getElementById("adminProductForm").innerHTML = `
-    <form class="panel" id="pForm" style="margin-bottom:14px">
-      <h3 style="margin:0 0 10px">${p ? "Edit" : "Add"} Product</h3>
-      <div class="field"><label>Name</label><input id="pName" required value="${p ? p.name.replace(/"/g, "&quot;") : ""}" /></div>
-      <div class="grid2">
-        <div class="field"><label>Price (₹)</label><input id="pPrice" type="number" min="1" required value="${p ? p.price : ""}" /></div>
-        <div class="field"><label>MRP (₹)</label><input id="pMrp" type="number" min="1" required value="${p ? p.mrp : ""}" /></div>
-      </div>
-      <div class="grid2">
-        <div class="field"><label>Category</label><select id="pCat">${CATEGORIES.map((c) => `<option ${p && p.cat === c.name ? "selected" : ""}>${c.name}</option>`).join("")}</select></div>
-        <div class="field"><label>Rating</label><input id="pRating" type="number" step="0.1" min="0" max="5" value="${p ? p.rating : 4.2}" /></div>
-      </div>
-      <div class="field"><label>Tags (comma separated: featured, trending, new, deal)</label><input id="pTags" value="${p ? p.tags.join(", ") : ""}" /></div>
-      <div class="field"><label>Image URL</label><input id="pImg" value="${p ? p.img : ""}" placeholder="https://..." /></div>
-      <div class="field"><label>Or upload image</label><input id="pFile" type="file" accept="image/*" /></div>
-      <img id="pPreview" class="img-preview" src="${p ? p.img : ""}" style="${p ? "" : "display:none"}" alt="preview" />
-      <div style="display:flex;gap:10px;margin-top:8px">
-        <button class="btn" type="submit">${p ? "Save changes" : "Add product"}</button>
-        <button class="btn outline" type="button" onclick="document.getElementById('adminProductForm').innerHTML=''">Cancel</button>
-      </div>
-    </form>`;
-  let uploaded = p ? p.img : "";
-  const file = document.getElementById("pFile");
-  const prev = document.getElementById("pPreview");
-  file.addEventListener("change", () => {
-    const f = file.files[0];
-    if (!f) return;
-    const r = new FileReader();
-    r.onload = () => { uploaded = r.result; prev.src = uploaded; prev.style.display = ""; };
-    r.readAsDataURL(f);
-  });
-  document.getElementById("pImg").addEventListener("input", (e) => {
-    if (e.target.value) { uploaded = e.target.value; prev.src = uploaded; prev.style.display = ""; }
-  });
-  document.getElementById("pForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const price = Number(document.getElementById("pPrice").value);
-    const mrp = Number(document.getElementById("pMrp").value);
-    if (mrp < price) return toast("MRP must be ≥ price", "err");
-    const data = {
-      id: p ? p.id : Date.now(),
-      name: document.getElementById("pName").value.trim(),
-      cat: document.getElementById("pCat").value,
-      price, mrp,
-      rating: Number(document.getElementById("pRating").value) || 4,
-      reviews: p ? p.reviews : Math.floor(Math.random() * 500) + 20,
-      tags: document.getElementById("pTags").value.split(",").map((t) => t.trim().toLowerCase()).filter(Boolean),
-      img: uploaded || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=70",
-    };
-    const list = PRODUCTS.slice();
-    if (p) list[list.findIndex((x) => x.id === p.id)] = data; else list.unshift(data);
-    saveProducts(list);
-    toast(p ? "Product updated" : "Product added");
-    adminProducts();
-  });
-}
-function adminDeleteProduct(id) {
-  if (!confirm("Delete this product?")) return;
-  saveProducts(PRODUCTS.filter((p) => p.id !== Number(id)));
-  toast("Product deleted", "info");
-  adminProducts();
-}
-
-/* ----- Categories ----- */
-function adminCategories() {
-  adminView(`
-    <div class="admin-head"><h3>Categories (${CATEGORIES.length})</h3></div>
-    <form class="panel" id="catForm" style="margin-bottom:14px">
-      <div class="grid2">
-        <div class="field"><label>Name</label><input id="cName" required placeholder="e.g. Grocery" /></div>
-        <div class="field"><label>Emoji</label><input id="cEmoji" required placeholder="🛒" maxlength="4" /></div>
-      </div>
-      <button class="btn" type="submit">+ Add Category</button>
-    </form>
-    <div class="admin-list">
-      ${CATEGORIES.map((c, i) => `<div class="row-item" style="align-items:center">
-        <div class="cat-emoji">${c.emoji}</div>
-        <div class="info"><b>${c.name}</b>
-          <div style="display:flex;gap:10px;margin-top:8px">
-            <button class="btn ghost" onclick="adminEditCategory(${i})">Edit</button>
-            <button class="link-danger" onclick="adminDeleteCategory(${i})">Delete</button>
-          </div>
-        </div>
-      </div>`).join("")}
-    </div>`);
-  document.getElementById("catForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const name = document.getElementById("cName").value.trim();
-    if (CATEGORIES.some((c) => c.name.toLowerCase() === name.toLowerCase())) return toast("Category already exists", "err");
-    saveCategories([...CATEGORIES, { name, emoji: document.getElementById("cEmoji").value.trim() || "🛍️" }]);
-    toast("Category added");
-    adminCategories();
-  });
-}
-function adminEditCategory(i) {
-  const c = CATEGORIES[i];
-  const name = prompt("Category name", c.name);
-  if (name === null) return;
-  const emoji = prompt("Category emoji", c.emoji);
-  if (emoji === null) return;
-  const list = CATEGORIES.slice();
-  list[i] = { name: name.trim() || c.name, emoji: emoji.trim() || c.emoji };
-  saveCategories(list);
-  toast("Category updated");
-  adminCategories();
-}
-function adminDeleteCategory(i) {
-  if (!confirm("Delete this category?")) return;
-  saveCategories(CATEGORIES.filter((_, k) => k !== i));
-  toast("Category deleted", "info");
-  adminCategories();
-}
-
-/* ----- Orders ----- */
-const ORDER_STATUSES = ["Confirmed", "Packed", "Shipped", "Out for delivery", "Delivered", "Cancelled"];
-function adminOrders() {
-  const orders = getOrders();
-  adminView(`
-    <div class="admin-head"><h3>Orders (${orders.length})</h3></div>
-    ${orders.map((o, i) => `<div class="panel" style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <b>#${o.id}</b><span class="status ${o.status === "Delivered" ? "done" : ""}">${o.status}</span>
-      </div>
-      <p class="muted" style="margin:6px 0">${new Date(o.date).toLocaleString()} · ${o.payment} · ${o.email || "guest"}</p>
-      <p class="muted" style="margin:0 0 8px">${o.items.map((it) => `${it.name} × ${it.qty}`).join(", ")}</p>
-      <div class="summary-line total"><span>Total</span><span>${money(o.total)}</span></div>
-      <p class="muted" style="margin:8px 0">Deliver to: ${o.address}</p>
-      <div class="field" style="margin:0"><label>Update status</label>
-        <select onchange="adminSetOrderStatus(${i}, this.value)">
-          ${ORDER_STATUSES.map((s) => `<option ${s === o.status ? "selected" : ""}>${s}</option>`).join("")}
-        </select>
-      </div>
-    </div>`).join("") || `<div class="empty"><div class="big">🧾</div><p>No orders yet.</p></div>`}`);
-}
-function adminSetOrderStatus(i, status) {
-  const orders = getOrders();
-  if (!orders[i]) return;
-  orders[i].status = status;
-  setOrders(orders);
-  toast("Order status updated");
-  adminOrders();
-}
-
-/* ----- Users ----- */
-function adminUsers() {
-  const users = getUsers();
-  adminView(`
-    <div class="admin-head"><h3>Users (${users.length})</h3></div>
-    ${users.map((u, i) => `<div class="row-item" style="align-items:center">
-      <div class="avatar" style="width:46px;height:46px;font-size:18px">${(u.name || "?").charAt(0).toUpperCase()}</div>
-      <div class="info"><b>${u.name}</b><div class="muted">${u.email}</div>
-        <button class="link-danger" style="margin-top:8px" onclick="adminDeleteUser(${i})">Delete user</button>
-      </div>
-    </div>`).join("") || `<div class="empty"><div class="big">👥</div><p>No registered users yet.</p></div>`}`);
-}
-function adminDeleteUser(i) {
-  if (!confirm("Delete this user?")) return;
-  const users = getUsers();
-  const removed = users.splice(i, 1)[0];
-  store.set("users", users);
-  const current = getUser();
-  if (current && removed && current.email === removed.email) localStorage.removeItem("user");
-  toast("User deleted", "info");
-  adminUsers();
-}
-
-/* ----- Notifications ----- */
-function adminNotifications() {
-  const list = getNotifications();
-  adminView(`
-    <div class="admin-head"><h3>Send notification to all users</h3></div>
-    <form class="panel" id="notifForm">
-      <div class="field"><label>Title</label><input id="nTitle" required placeholder="Mega Sale is live!" /></div>
-      <div class="field"><label>Message</label><textarea id="nBody" rows="3" required placeholder="Flat 50% off on Electronics till midnight."></textarea></div>
-      <button class="btn block lg" type="submit">📢 Send to all users</button>
-    </form>
-    <div class="admin-head" style="margin-top:16px"><h3>Sent (${list.length})</h3>${list.length ? `<button class="link-danger" onclick="adminClearNotifications()">Clear all</button>` : ""}</div>
-    ${list.map((n) => `<div class="panel" style="margin-bottom:10px"><b>${n.title}</b><p class="muted" style="margin:6px 0 0">${n.body}</p><p class="muted" style="margin:6px 0 0;font-size:11px">${new Date(n.date).toLocaleString()}</p></div>`).join("")}`);
-  document.getElementById("notifForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const n = { id: "N" + Date.now(), title: document.getElementById("nTitle").value.trim(), body: document.getElementById("nBody").value.trim(), date: new Date().toISOString() };
-    setNotifications([n, ...getNotifications()]);
-    toast("Notification sent to all users 📢");
-    adminNotifications();
-  });
-}
-function adminClearNotifications() {
-  if (!confirm("Clear all notifications?")) return;
-  setNotifications([]);
-  store.set("qb_notif_seen", []);
-  adminNotifications();
-}
-
-/* ----- Settings ----- */
-function adminSettings() {
-  const s = getSettings();
-  adminView(`
-    <div class="admin-head"><h3>Store Settings</h3></div>
-    <form class="panel" id="setForm">
-      <div class="field"><label>Store Name</label><input id="sName" required value="${s.storeName}" /></div>
-      <div class="field"><label>Tagline</label><input id="sTag" value="${s.tagline}" /></div>
-      <div class="field"><label>Contact Number</label><input id="sPhone" value="${s.phone}" /></div>
-      <div class="field"><label>Address</label><textarea id="sAddr" rows="2">${s.address}</textarea></div>
-      <div class="field"><label>Logo Upload</label><input id="sLogo" type="file" accept="image/*" /></div>
-      <img id="sPreview" class="img-preview" src="${s.logo}" style="${s.logo ? "" : "display:none"}" alt="logo preview" />
-      <div style="display:flex;gap:10px;margin-top:8px">
-        <button class="btn" type="submit">Save settings</button>
-        ${s.logo ? `<button class="btn outline" type="button" onclick="adminRemoveLogo()">Remove logo</button>` : ""}
-      </div>
-    </form>`);
-  let logo = s.logo;
-  const prev = document.getElementById("sPreview");
-  document.getElementById("sLogo").addEventListener("change", (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    const r = new FileReader();
-    r.onload = () => { logo = r.result; prev.src = logo; prev.style.display = ""; };
-    r.readAsDataURL(f);
-  });
-  document.getElementById("setForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    setSettings({
-      storeName: document.getElementById("sName").value.trim() || "Quick Buy",
-      tagline: document.getElementById("sTag").value.trim(),
-      phone: document.getElementById("sPhone").value.trim(),
-      address: document.getElementById("sAddr").value.trim(),
-      logo,
-    });
-    toast("Settings saved");
-    renderAdminBrand();
-    adminSettings();
-  });
-}
-function adminRemoveLogo() {
-  setSettings({ ...getSettings(), logo: "" });
-  toast("Logo removed", "info");
-  renderAdminBrand();
-  adminSettings();
-}
-function renderAdminBrand() {
-  const s = getSettings();
-  const el = document.getElementById("adminBrand");
-  if (el) el.innerHTML = `${s.logo ? `<img class="logo-img" src="${s.logo}" alt="${s.storeName}" />` : `<span class="logo-mark">${s.storeName.charAt(0).toUpperCase()}</span>`}<span>${s.storeName}<small>Admin Panel</small></span>`;
-}
-
-/* ================= Public API aliases & boot ================= */
-
-/* True only when the admin credentials were used in the Admin Panel login. */
-function isAdmin() {
-  return isAdminLoggedIn();
-}
-
-/* Wishlist alias with the canonical name */
-function toggleWishlist(id) { return toggleWish(id); }
-
-/* Renders the Admin Panel (alias of initAdmin, used by admin.html) */
-function renderAdmin() { return initAdmin(); }
-
-/* Generic boot: mounts shared chrome + renders the page named on <body data-page>. */
-function initApp() {
-  const page = document.body.dataset.page || "home";
-  const navFor = { home: "home", product: "home", categories: "categories", wishlist: "wishlist", cart: "cart", checkout: "cart", orders: "account", profile: "account", login: "account", register: "account" };
-  if (page === "admin") return renderAdmin();
-  mountChrome(navFor[page] || "home");
-  const routes = {
-    home: renderHome,
-    categories: renderCategories,
-    product: renderProduct,
-    cart: renderCart,
-    checkout: renderCheckout,
-    wishlist: renderWishlist,
-    orders: renderOrders,
-    profile: renderProfile,
-    login: initLogin,
-    register: initRegister,
-  };
-  try { (routes[page] || (() => {}))(); } catch (err) { console.error("initApp:", err); }
-  refreshBadges();
+@media (min-width: 720px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+  .cats { grid-template-columns: repeat(8, 1fr); }
+  .slide img { height: 280px; }
+  .card-img img { height: 180px; }
 }
