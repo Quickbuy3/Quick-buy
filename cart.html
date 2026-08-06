@@ -1,95 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quick Buy Cart</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Your Cart — Quick Buy</title>
+<meta name="description" content="Review items in your Quick Buy cart and proceed to secure checkout." />
+<link rel="stylesheet" href="style.css" />
 </head>
-
-<body>
-
-<header>
-<h1>🛒 Quick Buy Cart</h1>
-<a href="index.html" style="color:white;">⬅ Continue Shopping</a>
-</header>
-
-<section>
-<div class="product">
-
-<h2>Your Cart</h2>
-
-<div id="cartItems"></div>
-
-<h3 id="total">Total: ₹0</h3>
-
-<button onclick="checkout()">Proceed to Checkout</button>
-
-</div>
-</section>
-
-<script>
-
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-let cartBox = document.getElementById("cartItems");
-let totalBox = document.getElementById("total");
-
-function loadCart(){
-
-cartBox.innerHTML="";
-
-let total=0;
-
-if(cart.length===0){
-cartBox.innerHTML="<p>🛒 Your cart is empty.</p>";
-totalBox.innerHTML="Total: ₹0";
-return;
-}
-
-cart.forEach((item,index)=>{
-
-let price=item.price*item.qty;
-total+=price;
-
-cartBox.innerHTML+=`
-<div class="product">
-<img src="${item.image}" alt="${item.name}" style="width:120px;height:120px;object-fit:cover;border-radius:10px;">
-<h3>${item.name}</h3>
-<p>Price: ₹${item.price}</p>
-<p>Quantity: ${item.qty}</p>
-<p><b>Subtotal: ₹${price}</b></p>
-
-<button onclick="removeItem(${index})">
-🗑️ Remove
-</button>
-
-</div>
-`;
-
-});
-
-totalBox.innerHTML="Total: ₹"+total;
-
-}
-
-function removeItem(index){
-
-cart.splice(index,1);
-
-localStorage.setItem("cart",JSON.stringify(cart));
-
-loadCart();
-
-}
-
-function checkout() {
-  window.location.href = "checkout.html";
-}
-
-loadCart();
-
-</script>
-
+<body data-page="cart">
+<div id="header-slot"></div>
+<main class="container">
+  <h1 class="page-title">Your Cart</h1>
+  <div id="cartList"></div>
+  <div id="cartSummary" style="margin-top:14px"></div>
+</main>
+<div id="nav-slot"></div>
+<script src="script.js"></script>
+<script>mountChrome("cart"); renderCart();</script>
 </body>
 </html>
