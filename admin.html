@@ -1,1 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Admin Panel — Quick Buy</title>
+<meta name="description" content="Quick Buy admin panel: manage products, categories, orders, users, notifications and store settings." />
+<meta name="robots" content="noindex" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="admin" data-page="admin">
+
+<header class="admin-header">
+  <div class="container header-row">
+    <div class="logo" id="adminBrand">
+      <span class="logo-mark">Q</span><span>Quick Buy<small>Admin Panel</small></span>
+    </div>
+    <div class="header-actions" style="margin-left:auto;display:flex;gap:6px">
+      <a class="icon-btn" href="index.html" aria-label="Open store">🏬</a>
+      <button class="icon-btn" data-theme-icon onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+      <button class="icon-btn" onclick="adminLogout()" aria-label="Logout">🚪</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Login -->
+  <section id="adminLogin" style="display:none">
+    <div class="panel admin-login">
+      <div class="lock">🔐</div>
+      <h1 class="page-title center" style="margin:8px 0 4px;font-size:20px">Admin Login</h1>
+      <p class="muted center" style="margin:0 0 16px">Sign in to manage your Quick Buy store.</p>
+      <form id="adminLoginForm">
+        <div class="field"><label>Email</label><input id="adEmail" type="email" required placeholder="admin@quickbuy.com" /></div>
+        <div class="field"><label>Password</label><input id="adPass" type="password" required placeholder="••••••••" /></div>
+        <button class="btn block lg" type="submit">Login as Admin</button>
+      </form>
+      <p class="muted center" style="margin-top:14px">Default: <b>admin@quickbuy.com</b> / <b>admin123</b></p>
+      <p class="center" style="margin-top:10px"><a class="muted" href="index.html">← Back to store</a></p>
+    </div>
+  </section>
+
+  <!-- Panel -->
+  <section id="adminApp" style="display:none">
+    <div class="admin-tabs">
+      <button class="admin-tab on" data-tab="dashboard" onclick="adminTab('dashboard')">📊 Dashboard</button>
+      <button class="admin-tab" data-tab="products" onclick="adminTab('products')">📦 Products</button>
+      <button class="admin-tab" data-tab="categories" onclick="adminTab('categories')">🗂️ Categories</button>
+      <button class="admin-tab" data-tab="orders" onclick="adminTab('orders')">🧾 Orders</button>
+      <button class="admin-tab" data-tab="users" onclick="adminTab('users')">👥 Users</button>
+      <button class="admin-tab" data-tab="notifications" onclick="adminTab('notifications')">🔔 Notifications</button>
+      <button class="admin-tab" data-tab="settings" onclick="adminTab('settings')">⚙️ Settings</button>
+    </div>
+    <div id="adminView"></div>
+    <p class="muted center" style="margin:26px 0">Quick Buy Admin v1.0</p>
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+<script>initAdmin();</script>
+</body>
+</html>
 
