@@ -441,6 +441,244 @@ function logout() { localStorage.removeItem("user"); toast("Logged out", "info")
 
 /* ---------- Profile ---------- */
 function renderProfile() {
+  /* ---------- Admin Panel ---------- */
+
+const getAdmin = () => store.get("admin", null);
+
+function initAdmin() {
+
+  const loginBox = document.getElementById("adminLogin");
+  const appBox = document.getElementById("adminApp");
+
+  if(!loginBox || !appBox) return;
+
+  const admin = getAdmin();
+
+  if(admin){
+    loginBox.style.display="none";
+    appBox.style.display="block";
+    adminTab("dashboard");
+  }else{
+    loginBox.style.display="block";
+    appBox.style.display="none";
+  }
+
+
+  const form = document.getElementById("adminLoginForm");
+
+  if(form){
+    form.addEventListener("submit",(e)=>{
+      e.preventDefault();
+
+      const email=document.getElementById("adEmail").value;
+      const pass=document.getElementById("adPass").value;
+
+
+      if(email==="admin@quickbuy.com" && pass==="admin123"){
+
+        store.set("admin",{
+          email:email,
+          role:"superadmin"
+        });
+
+        toast("Admin login successful");
+
+        loginBox.style.display="none";
+        appBox.style.display="block";
+
+        adminTab("dashboard");
+
+      }else{
+
+        toast("Wrong admin details","err");
+
+      }
+
+    });
+  }
+
+}
+
+
+function adminLogout(){
+
+  localStorage.removeItem("admin");
+
+  toast("Admin logout","info");
+
+  setTimeout(()=>{
+    location.reload();
+  },700);
+
+}
+  /* ---------- Admin Tabs ---------- */
+
+function adminTab(tab){
+
+  document.querySelectorAll(".admin-tab").forEach(btn=>{
+    btn.classList.remove("on");
+    if(btn.dataset.tab===tab){
+      btn.classList.add("on");
+    }
+  });
+
+
+  const view=document.getElementById("adminView");
+
+  if(!view) return;
+
+
+  if(tab==="dashboard"){
+    renderAdminDashboard();
+  }
+
+  else if(tab==="products"){
+    renderAdminProducts();
+  }
+
+  else if(tab==="categories"){
+    renderAdminCategories();
+  }
+
+  else if(tab==="orders"){
+    renderAdminOrders();
+  }
+
+  else if(tab==="users"){
+    renderAdminUsers();
+  }
+
+  else if(tab==="notifications"){
+    renderAdminNotifications();
+  }
+
+  else if(tab==="settings"){
+    renderAdminSettings();
+  }
+
+}
+
+
+/* ---------- Admin Dashboard ---------- */
+
+function renderAdminDashboard(){
+
+ const view=document.getElementById("adminView");
+
+ view.innerHTML=`
+
+ <div class="grid">
+
+ <div class="panel center">
+ <h2>📦</h2>
+ <b style="font-size:24px">${PRODUCTS.length}</b>
+ <p class="muted">Products</p>
+ </div>
+
+
+ <div class="panel center">
+ <h2>🛒</h2>
+ <b style="font-size:24px">${getOrders().length}</b>
+ <p class="muted">Orders</p>
+ </div>
+
+
+ <div class="panel center">
+ <h2>👥</h2>
+ <b style="font-size:24px">${getUsers().length}</b>
+ <p class="muted">Users</p>
+ </div>
+
+
+ </div>
+
+
+ <div class="panel" style="margin-top:15px">
+
+ <h2>Quick Buy Admin</h2>
+
+ <p class="muted">
+ Manage products, orders, customers and store settings from here.
+ </p>
+
+ </div>
+
+ `;
+
+}
+
+
+
+/* ---------- Admin Products ---------- */
+
+function renderAdminProducts(){
+
+const view=document.getElementById("adminView");
+
+
+view.innerHTML=`
+
+<div class="panel">
+
+<h2>📦 Manage Products</h2>
+
+
+<button class="btn" onclick="adminAddProduct()">
+➕ Add Product
+</button>
+
+
+<div style="margin-top:15px">
+
+${PRODUCTS.map(p=>`
+
+<div class="row-item">
+
+<img src="${p.img}" />
+
+<div class="info">
+
+<b>${p.name}</b>
+
+<div>
+${money(p.price)}
+</div>
+
+
+<button class="btn outline"
+onclick="adminDeleteProduct(${p.id})">
+Delete
+</button>
+
+
+</div>
+
+</div>
+
+
+`).join("")}
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+function adminAddProduct(){
+
+toast("Product add feature next update","info");
+
+}
+
+
+function adminDeleteProduct(id){
+
+toast("Demo catalog cannot delete yet","info");
+
+}
   const u = getUser();
   const el = document.getElementById("profileBox");
   if (!u) {
