@@ -1,101 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quick Buy</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Quick Buy — Shop Electronics, Fashion & More at Best Prices</title>
+<meta name="description" content="Quick Buy is a fast mobile-first shopping app with daily deals, trending products, new arrivals and free delivery across categories." />
+<meta property="og:title" content="Quick Buy — Shop Smarter, Save More" />
+<meta property="og:description" content="Daily deals, trending products and new arrivals with free delivery." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="stylesheet" href="style.css" />
 </head>
+<body data-page="home">
+<div id="header-slot"></div>
 
-<body>
+<main class="container">
+  <div id="searchResults" style="display:none"></div>
 
-<header>
-  <h1>🛒 Quick Buy</h1>
-  <p>Everything you need, delivered fast</p>
-  <a href="cart.html" style="color:white;text-decoration:none;font-weight:bold;">🛒 Cart</a>
-</header>
+  <div id="homeSections">
+    <div class="slider">
+      <div class="slides">
+        <div class="slide"><img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&q=70" alt="Mega electronics sale banner" /><div class="slide-caption"><strong>Mega Electronics Sale</strong><span>Up to 60% off on top brands</span></div></div>
+        <div class="slide"><img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&q=70" alt="Fashion week offers banner" /><div class="slide-caption"><strong>Fashion Week Offers</strong><span>Trending styles from ₹499</span></div></div>
+        <div class="slide"><img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1200&q=70" alt="Home essentials banner" /><div class="slide-caption"><strong>Home Essentials</strong><span>Flat 50% off + free delivery</span></div></div>
+      </div>
+      <div class="dots"></div>
+    </div>
 
-<div class="search">
-  <input
-    type="text"
-    id="search"
-    placeholder="🔍 Search products..."
-    onkeyup="searchProducts()">
-</div>
+    <section class="section">
+      <div class="section-head"><h2>Shop by Category</h2><a class="link" href="categories.html">View all</a></div>
+      <div class="cats" id="cats"></div>
+    </section>
 
-<section>
-<h2>Categories</h2>
+    <section class="section">
+      <div class="section-head"><h2>⭐ Featured Products</h2><a class="link" href="categories.html">See more</a></div>
+      <div class="rail" id="featured"></div>
+    </section>
 
-<div class="cards">
-  <div class="card">📱 Electronics</div>
-  <div class="card">👕 Fashion</div>
-  <div class="card">🏠 Home</div>
-  <div class="card">🛒 Grocery</div>
-</div>
+    <section class="section">
+      <div class="section-head"><h2>🔥 Best Deals</h2><a class="link" href="categories.html?cat=Deals">See more</a></div>
+      <div class="grid" id="deals"></div>
+    </section>
 
-</section>
+    <section class="section">
+      <div class="section-head"><h2>📈 Trending Now</h2></div>
+      <div class="rail" id="trending"></div>
+    </section>
 
-<section>
+    <section class="section">
+      <div class="section-head"><h2>🆕 New Arrivals</h2></div>
+      <div class="grid" id="arrivals"></div>
+    </section>
 
-<h2>Featured Products</h2>
+    <p class="muted center" style="margin:26px 0 10px">Quick Buy · Free delivery · 7-day easy returns · Secure payments</p>
+  </div>
+</main>
 
-<div class="products">
-
-<div class="product">
-  <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500" alt="Smart Phone">
-  <h3>📱 Smart Phone</h3>
-  <p>⭐ 4.5 Rating</p>
-  <p><strong>₹9,999</strong></p>
-  <button onclick="addToCart('Smart Phone',9999)">
-    🛒 Add to Cart
-  </button>
-</div>
-
-<div class="product">
-  <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500" alt="Wireless Headphone">
-  <h3>🎧 Wireless Headphone</h3>
-  <p>⭐ 4.3 Rating</p>
-  <p><strong>₹1,999</strong></p>
-  <button onclick="addToCart('Wireless Headphone',1999)">
-    🛒 Add to Cart
-  </button>
-</div>
-
-<div class="product">
-  <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500" alt="Laptop">
-  <h3>💻 Laptop</h3>
-  <p>⭐ 4.6 Rating</p>
-  <p><strong>₹49,999</strong></p>
-  <button onclick="addToCart('Laptop',49999)">
-    🛒 Add to Cart
-  </button>
-</div>
-
-<div class="product">
-  <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500" alt="T Shirt">
-  <h3>👕 T-Shirt</h3>
-  <p>⭐ 4.4 Rating</p>
-  <p><strong>₹799</strong></p>
-  <button onclick="addToCart('T-Shirt',799)">
-    🛒 Add to Cart
-  </button>
-</div>
-
-<div class="product">
-  <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" alt="Shoes">
-  <h3>👟 Shoes</h3>
-  <p>⭐ 4.5 Rating</p>
-  <p><strong>₹2,499</strong></p>
-  <button onclick="addToCart('Shoes',2499)">
-    🛒 Add to Cart
-  </button>
-</div>
-
-</div>
-
-</section>
-
+<div id="nav-slot"></div>
 <script src="script.js"></script>
-
+<script>mountChrome("home"); renderHome();</script>
 </body>
 </html>
